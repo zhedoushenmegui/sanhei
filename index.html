@@ -19,6 +19,10 @@
     <style>
         body {
             background-color: #CCCCCC;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            user-select: none;
         }
         #content {
             margin-top: 20px;
@@ -110,10 +114,6 @@
         #playground{
             cursor: pointer;
             width: 100%;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -khtml-user-select: none;
-            user-select: none;
         }
         #playground > div {
             width: 100%;
@@ -140,7 +140,18 @@
             text-align: center;
             vertical-align: middle;
             padding: 0 2px;
-            margin: 10px 1px;
+            margin: 10px 1px 0;
+        }
+        #scorePanel {
+            margin-bottom: 10px;
+        }
+        /* 暂存区 */
+        .temp-hub {
+            text-align: left;
+            padding: 5px 10px;
+        }
+        .temp-hub>p {
+            margin-bottom: 0;
         }
     </style>
 
@@ -170,7 +181,7 @@
             </div>
         </div>
 
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel" id="scorePanel">
             <div ng-hide="true">
                 <h4>当前维度:
                     <label class="label label-info"> {{dim}}</label>
@@ -205,6 +216,17 @@
                           ng-click="goStep(pot)">{{pot.val}}</span>
                 </div>
             </div>
+        </div>
+
+        <!-- temp hub -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel temp-hub" ng-hide="data.tempHub.length < 1">
+            <p>
+                暂存区:
+                <span ng-repeat="item in data.tempHub track by $index"
+                      class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
+                    {{item}}
+                </span>
+            </p>
         </div>
 
         <!-- best score -->
@@ -289,7 +311,8 @@
         pauseTime:100,   // 数字落下后暂停时间
         scoreFactor: 2,    // 没多一个增加2倍分数
         scoreFactorLevel: 3,    // 没多一层增加3倍分数
-        mapSize: 8
+        mapSize: 8,             // 地图尺寸
+        tempHubNum: 2,          // 临时存储区大小
     };
 
     // 随机生成棋盘内容
@@ -432,6 +455,7 @@
             now:0,      // 下一个出现的内容
             score:0,    // 得分
             step:0,      // 步数
+            tempHub: [],
             locations: [] // 地图左上角坐标, 前两个是固定的
         };
         $scope.best = {
@@ -444,6 +468,28 @@
 
         // 地图初始化
         var map = [];
+
+        // 临时存储区初始化
+        function initTempHub() {
+            for(var i =0;i< config.tempHubNum; i++) {
+                $scope.data.tempHub.push(0);
+            }
+        }
+
+        /**
+         * 临时存储区交换
+         * @param index 临时存储区下标
+         */
+        $scope.swapTempHub = function(index) {
+            var t = $scope.data.tempHub[index];
+            $scope.data.tempHub[index] = $scope.data.now;
+            if(t === 0) {
+                // 原来暂存区是空的, 则重新生成一个
+                generateNextChess();
+            }else {
+                $scope.data.now = t;
+            }
+        };
 
         // 修改维度
         $scope.changeDim = function(dim) {
@@ -740,9 +786,14 @@
                 $scope.data.score = obj.score;
                 $scope.data.step = obj.step;
             }
+            // 更新地图
             changePlane(map);
-            saveStatus();
+            // 地图重绘
             setInterval(potSize, 500);
+            // 保存地图状态
+            saveStatus();
+            // 暂存区初始化
+            initTempHub();
         }
         init(false);
 
