@@ -579,7 +579,7 @@
             }
             $scope.data.step += 1;
             chessIn(pot.loc);
-            updateBest(0);
+            updateBest(pot.val);
         };
 
         // 计算分数, 跟当前合成的元素和合成的个数有关
@@ -788,6 +788,11 @@
                 loadStatus();
                 if(map.length != $scope.size) {
                     initMap($scope.dim, $scope.size);
+                }
+                if($scope.data.tempHub === undefined ||$scope.data.tempHub.length != config.tempHubNum) {
+                    $scope.data.tempHub = [];
+                    // 暂存区初始化
+                    initTempHub();
                 }
             }
             // 更新地图
