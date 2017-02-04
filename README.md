@@ -1,4 +1,4 @@
-# Sahei
+# Sanhei
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 ### 还是三合一(Another Threes Game)
 
