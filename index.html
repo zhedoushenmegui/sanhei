@@ -292,10 +292,10 @@
 
     var config = {
       prob:{
-          1:500,
-          2:60,
-          3:15,
-          4:10,
+          1:520,
+          2:80,
+          3:40,
+          4:20,
           '-1': 120,
           '-2': 30,
           '-3': 2
@@ -311,7 +311,7 @@
         pauseTime:100,   // 数字落下后暂停时间
         scoreFactor: 2,    // 没多一个增加2倍分数
         scoreFactorLevel: 3,    // 没多一层增加3倍分数
-        mapSize: 8,             // 地图尺寸
+        mapSize: 7,             // 地图尺寸
         tempHubNum: 2,          // 临时存储区大小
     };
 
@@ -489,6 +489,7 @@
             }else {
                 $scope.data.now = t;
             }
+            saveStatus();
         };
 
         // 修改维度
@@ -505,6 +506,7 @@
 
         $scope.changeSoundState = function() {
             $scope.settings.soundPlay = !$scope.settings.soundPlay;
+            saveStatus();
         };
 
         function initMap(dim, size) {
@@ -773,18 +775,16 @@
             for(var i = 0;i<$scope.dim;i++) {
                 $scope.data.locations.push(0);
             }
+            // 暂存区初始化
+            initTempHub();
+            // 状态初始化
             if(restart || loadStatus() === null) {
                 // 重新生成地图
                 initMap($scope.dim, $scope.size);
                 generateNextChess();
             }else {
-                // 从ls 里加载地图
-                var obj = loadStatus();
-                map = obj.map;
-                $scope.data.now = obj.next;
-                // 加载分数
-                $scope.data.score = obj.score;
-                $scope.data.step = obj.step;
+                // 从ls 里加载地图, 配置, 分数等
+                loadStatus();
             }
             // 更新地图
             changePlane(map);
@@ -792,8 +792,6 @@
             setInterval(potSize, 500);
             // 保存地图状态
             saveStatus();
-            // 暂存区初始化
-            initTempHub();
         }
         init(false);
 
@@ -819,7 +817,9 @@
                 map: map,
                 next: $scope.data.now,
                 score: $scope.data.score,
-                step: $scope.data.step
+                step: $scope.data.step,
+                tempHub: $scope.data.tempHub,
+                settings: $scope.settings
             };
             var jsonMap = JSON.stringify(mapObj);
             var mapStr = base64Encoder(jsonMap);
@@ -834,7 +834,13 @@
             }
             var mapStr = localStorage.getItem(lsNameArray.map);
             var jsonMap = base64Decoder(mapStr);
-            return JSON.parse(jsonMap);
+            var obj = JSON.parse(jsonMap);
+            map = obj.map;
+            $scope.data.now = obj.next;
+            $scope.data.score = obj.score;
+            $scope.data.step = obj.step;
+            $scope.data.tempHub = obj.tempHub;
+            $scope.settings = obj.settings;
         }
 
         // 保存最好成绩
