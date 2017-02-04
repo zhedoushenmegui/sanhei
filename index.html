@@ -202,17 +202,6 @@
             </p>
         </div>
 
-        <!-- temp hub -->
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel temp-hub" ng-hide="data.tempHub.length < 1">
-            <p>
-                暂存区:
-                <span ng-repeat="item in data.tempHub track by $index"
-                      class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
-                    {{item}}
-                </span>
-            </p>
-        </div>
-
         <div id="playground">
             <div id="thead" ng-hide="true">
                 <div name="tr" class="line">
@@ -227,6 +216,17 @@
                           ng-click="goStep(pot)">{{pot.val}}</span>
                 </div>
             </div>
+        </div>
+
+        <!-- temp hub -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel temp-hub" ng-hide="data.tempHub.length < 1">
+            <p>
+                暂存区:
+                <span ng-repeat="item in data.tempHub track by $index"
+                      class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
+                    {{item}}
+                </span>
+            </p>
         </div>
 
         <!-- best score -->
