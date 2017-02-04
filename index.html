@@ -801,9 +801,16 @@
         function potSize() {
             var length = $('#playground').width();
             var size = config.mapSize;
-            $('.pot').css('width', length/size + 'px')
-                .css('height', length/size + 'px')
-                .css('line-height', length/size + 'px');
+            var width = Math.floor(length/size);
+            $('.pot').css('width', width + 'px')
+                .css('height', width + 'px')
+                .css('line-height', width + 'px');
+            if(width>50) {
+                width = 50;
+                $('.temp-hub .pot').css('width', width + 'px')
+                    .css('height', width + 'px')
+                    .css('line-height', width + 'px');
+            }
         }
 
         // 保存地图
