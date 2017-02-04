@@ -2,46 +2,168 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title></title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>还是三合一</title>
     <meta name="apple-touch-fullscreen" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="email=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="img/scar.png" />
+    <link rel="apple-touch-icon-precomposed" href="/img/scar.png" />
+    <link rel="icon" href="img/favicon.ico" />
 
     <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" />
     <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap-theme.min.css" />
     <link rel="stylesheet" href="http://www.bootcss.com/p/buttons/css/buttons.css" />
     <style>
         body {
-
+            background-color: #CCCCCC;
         }
         #content {
             margin-top: 20px;
         }
+        #soundControl {
+            width: 26px;
+            height: 26px;
+            border: 2px solid black;
+            border-radius: 50%;
+
+            float:right;
+            right: 40px;
+            top:30px;
+            margin-top: 5px;
+
+            text-align: center;
+            line-height: 160%;
+            cursor: pointer;
+        }
+
+        .disable {
+            color:grey;
+        }
+        .cl0{
+            background-color: #CCFFCC;
+            color: #CCFFCC;
+        }
+        .cl1{
+            background-color: #FFFF99;
+        }
+        .cl2{
+            background-color: #FFCC99;
+        }
+        .cl3{
+            background-color: #FF9999;
+        }
+        .cl4{
+            background-color: #CCCC99;
+        }
+        .cl5{
+            background-color: #CC9999;
+        }
+        .cl6{
+            background-color: #99CC99;
+        }
+        .cl7{
+            background-color: #9999CC;
+        }
+        .cl8{
+            background-color: #99CCFF;
+        }
+        .cl9{
+            background-color: #999966;
+        }
+        .cl-1{
+            background-color: #336699;
+            color:#ffffff;
+        }
+        .cl-2{
+            background-color: #336666;
+            color:#ffffff;
+        }
+        .cl-3{
+            background-color: #333333;
+            color:#ffffff;
+        }
+        .cl-4{
+            background-color: #000033;
+            color:#ffffff;
+        }
+        #nextOne{
+            line-height: 36px;
+            border: 2px solid #000000;
+            font-weight: 300;
+            font-size: 16px;
+            font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            text-decoration: none;
+            text-align: center;
+            vertical-align: middle;
+            padding: 0 20px;
+            margin: 0 10px;
+            transition-duration: .3s;
+        }
+        .button{
+            padding: 0 20px;
+        }
+
+        /* 地图样式 */
+        #playground{
+            cursor: pointer;
+            width: 100%;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            user-select: none;
+        }
+        #playground > div {
+            width: 100%;
+        }
+        .line{
+            width: 100%;
+            margin: 0 auto;
+        }
+        .pot{
+            display: inline-block;
+            border: 1px solid whitesmoke;
+            font-weight: 300;
+            font-size: 16px;
+            vertical-align: middle;
+            text-align: center;
+        }
     </style>
 
 </head>
-<body class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<body>
     <div id="content" class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-md-offset-3 col-lg-offset-4" ng-app="myApp" ng-controller="myCtrl">
+        <div>
+            <audio id="gameSound" ng-hide="true">
+                <source src="media/2487.wav" type="audio/wav">
+            </audio>
+        </div>
+
+        <div id="soundControl">
+            <span class="glyphicon glyphicon-volume-down" ng-hide="settings.soundPlay" ng-click="changeSoundState()"></span>
+            <span class="glyphicon glyphicon-volume-off" ng-show="settings.soundPlay" ng-click="changeSoundState()"></span>
+        </div>
         <div id="head">
             <div>
-                <button class="btn button dim button-border button-rounded button-primary col-xs-3"
-                ng-repeat="item in [2,3,4,5]">
-                    {{item}}
+                <button class="btn button dim button-border button-rounded button-primary"
+                ng-repeat="item in [2]" ng-click="changeDim(item)">
+                    重新开始
                 </button>
-            </div>
-            <div>
-                <h3>当前维度:
-                    <label class="label label-info"> {{dim}}</label>
-                </h3>
+                <span>
+                    <label id="nextOne" class="button-rounded" ng-class="'cl'+data.now">下一个:{{data.now}}</label>
+                </span>
             </div>
         </div>
 
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div ng-hide="true">
+                <h4>当前维度:
+                    <label class="label label-info"> {{dim}}</label>
+                </h4>
+            </div>
             <p>
-                <span>
-                    当前:{{data.now}}
-                </span>
 
                 <span>
                     得分:{{data.score}}
@@ -50,83 +172,476 @@
                 <span>
                     步数:{{data.step}}
                 </span>
+                <p ng-hide="true">
+                坐标:
+                [ <span ng-repeat="item in data.locations track by $index"><i ng-hide="$index==0">, </i>{{item}}</span> ]
+                </p>
             </p>
         </div>
 
-        <div id="playground" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-responsive">
-            <table class="table table table-hover table-bordered">
-                <thead>
+        <div id="playground">
+            <div id="thead" ng-hide="true">
+                <div name="tr" class="line">
+                    <span class="pot">#</span>
+                    <span class="pot" ng-repeat="col in data.cols track by $index">{{col}}</span>
+                </div>
+            </div>
+            <div id="tbody">
+                <div class="line" ng-repeat="row in data.sandbox track by $index">
+                    <span class="pot" ng-hide="true">{{$index + 1}}</span>
+                    <span class="pot" ng-repeat="pot in row track by $index" ng-class="'cl'+pot.val"
+                          ng-click="goStep(pot)">{{pot.val}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-hide="true">
+            <div>
+                <table class="table table table-hover table-bordered">
                     <tr>
-                        <td>#</td>
-                        <td ng-repeat="col in data.cols track by $index">{{col}}</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="row in data.sandbox track by $index">
-                        <td>{{$index + 1}}</td>
-                        <td ng-repeat="pot in data.row track by $index">
-                            {{pot}}
+                        <td>+</td>
+                        <td ng-repeat="item in data.locations track by $index" ng-class="{'disable':$index<2}" ng-click="changePlane($index, 1)">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <p>
-                坐标:{{0}},{{0}},{{0}},{{0}},{{0}}
-            </p>
-            <div>
-                
+                    <tr>
+                        <td>位面调整</td>
+                        <td ng-repeat="item in data.locations track by $index" ng-class="{'disable':$index<2}">
+                            {{item}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>-</td>
+                        <td ng-repeat="item in data.locations track by $index" ng-class="{'disable':$index<2}" ng-click="changePlane($index, 0)">
+                            <span class="glyphicon glyphicon-arrow-down"></span>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 </body>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="http://apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="http://apps.bdimg.com/libs/angular.js/1.5.0-beta.0/angular.min.js"></script>
+<script src="./vendor/angular/angularjs.1.5.js"></script>
 <script>
-    var app = angular.module('myApp', []);
+    "use strict";
+    const DIM_BASE = 2;
+    var ll = function(){
+        for(var i in arguments)
+            console.log(arguments[i])
+        console.log('-----')
+    };
 
     var config = {
       prob:{
-          1:1000,
-          2:50,
+          1:500,
+          2:75,
           3:20,
           4:10,
           '-1': 100,
           '-2': 20
-      }
+      }, defaultDim: 2,      // 默认维度
+        gameStatus:{
+              'ready': 0,
+            'running': 1,
+            'end':2,
+            'sys_pause': 3
+        },
+        upLimit:9,     // 数字上限
+        downLimit:-4,    // 数字下限
+        pauseTime:100,   // 数字落下后暂停时间
+        scoreFactor: 2,    // 没多一个增加2倍分数
+        scoreFactorLevel: 3,    // 没多一层增加3倍分数
+        mapSize: 8
     };
 
-    function generater() {
+    // 随机生成棋盘内容
+    function generator(probs) {
         var all = 0;
-        for(var i in config.prob) {
-            all += config.prob
+        for(var i in probs) {
+            all += probs[i];
         }
-        var ts = new Date().getTime();
-
-
+        var mod = Math.floor(Math.random()*all);
+        for(var i in probs) {
+            mod -= probs[i]
+            if( mod < 0 ) {
+                return parseInt(i);
+            }
+        }
+        return 1;
     }
 
+    function initGenerator() {
+        var probs = deepCopy(config.prob);
+        probs[0] = 800;
+        return generator(probs)
+    }
+
+    function isArray(obj) {
+        return Object.prototype.toString.call(obj) === '[object Array]';
+    }
+
+    function deepCopy(source) {
+        if(isArray(source)){
+            var arr = [];
+            source.forEach(function(v, k) {
+                arr[k] = deepCopy(v)
+            });
+            return arr;
+        }else if(typeof source === 'object'){
+            var result={};
+            for (var key in source) {
+                result[key] = typeof source[key] === 'object'? deepCopy(source[key]): source[key];
+            }
+            return result;
+        }else {
+            return source;
+        }
+    }
+
+    var app = angular.module('myApp', []);
     app.controller('myCtrl', function($scope) {
-        $scope.size = 7;
-        $scope.dim = 2;
+        var forbidLocInfoTime = 3;
+        var status = 0;      // 游戏状态
+        var defaultDim = config.defaultDim;
+        var rangeLevel = 0;
+        $scope.settings = {
+            soundPlay: true
+        };
+        $scope.dimBase = DIM_BASE;  // 地图是二维的
+        $scope.size = config.mapSize;     // 地图尺寸
+        $scope.dim = defaultDim;      // 游戏维度
         $scope.data = {
             cols:[],
-            sandbox:[],
-            now:0,
+            sandbox:[], // 地图在当前坐标下的内容
+            now:0,      // 下一个出现的内容
+            score:0,    // 得分
+            step:0,      // 步数
+            locations: [] // 地图左上角坐标, 前两个是固定的
+        };
+        $scope.best = {
+            number:0,
             score:0,
             step:0
         };
+        var map = [];
+
+        // 修改维度
+        $scope.changeDim = function(dim) {
+            if(status === config.gameStatus.running) {
+                var ret = confirm("将重新开始, 确认?");
+                if(!ret) {
+                    return;
+                }
+            }
+            $scope.dim = dim;
+            init();
+        };
+
+        $scope.changeSoundState = function() {
+            $scope.settings.soundPlay = !$scope.settings.soundPlay;
+        };
+
+        function initMap(dim, size) {
+            function generateMap(level, location) {
+                if(level === dim) {
+                    return {
+                        val:initGenerator(),
+                        loc: location
+                    };
+                }else {
+                    var tmpMap = [];
+                    for(var i =0; i< size;i++) {
+                        var tmpLoc = deepCopy(location);
+                        tmpLoc.push(i);
+                        tmpMap[i] = generateMap(level+1, tmpLoc)
+                    }
+                    return tmpMap;
+                }
+            }
+            // 生成地图
+            var newMap = generateMap(0, []);
+            // 重置位面
+            changePlane(newMap);
+            map = newMap;
+
+            setTimeout(potSize, 100)
+        }
+
+        // 更新位面/ 更新页面上的数字
+        function changePlane(map) {
+            var location = $scope.data.locations;
+            var tmpMap = map;
+            for(var i=0, len = location.length-DIM_BASE;i<len;i++) {
+                tmpMap = tmpMap[location[i]];
+            }
+            $scope.data.sandbox = tmpMap;
+        }
+
+        // 更新位面
+        $scope.changePlane = function(index, ifUp) {
+            var t = $scope.data.locations[index];
+            if(ifUp) {
+                t ++;
+            }else{
+                t --;
+            }
+            $scope.data.locations[index] = (t+config.mapSize*10) % config.mapSize;
+            changePlane(map);
+        };
+
+        // 点击响应
+        $scope.goStep = function(pot) {
+            if(status === config.gameStatus.sys_pause) {
+                return;
+            }else if(status === config.gameStatus.end) {
+                var ret = confirm('重新开始游戏?');
+                if(!ret) {
+                    return;
+                }else{
+                    init();
+                }
+            }
+            status = config.gameStatus.running;
+            if(pot.val !== 0) {
+                if(forbidLocInfoTime-- > 0) {
+                    alert('有数字位置不能放置数字,只能落在空地上.');
+                }
+                return;
+            }
+            chessIn(pot.loc);
+            $scope.data.step += 1;
+        };
+
+        window.a = function (v) {
+            $scope.data.now = v;
+            $scope.$apply();
+        };
+
+        // 计算分数, 跟当前合成的元素和合成的个数有关
+        function countScore(val, size) {
+            var factor = 5+config.scoreFactor * (size -3)+ config.scoreFactorLevel*rangeLevel;
+            if(val === config.downLimit) {
+                // 负数合成消失的时候加分, 平时减分
+                factor *= -1;
+            }
+            $scope.data.score += factor * val;
+        }
+
+        // 每个棋子的进阶
+        function chessNextLevel(target) {
+            if(target<0){
+                target --;
+            }else{
+                target ++;
+            }
+            if(target>config.upLimit || target < config.downLimit){
+                return 0;
+            }
+            return target;
+        }
+
+        // 数字放下响应
+        function chessIn(location) {
+            rangeLevel = 0;
+            var chessNum = deepCopy($scope.data.now);
+            // 生成下一个数字
+            generateNextChess();
+            setTargetChess(location, chessNum);
+            changePlane(map);
+            // 数字放下停顿0.1s
+            status = config.gameStatus.sys_pause;
+            var everConbined = false;
+            while(true) {
+                var val = getTargetChess(location);
+                var scorePoints = chessInProcess(location, val);
+                var len = scorePoints.length;
+                if(len < 3) {
+                    break;
+                }
+                everConbined = true;
+                for(var i=0;i<len;i++) {
+                    setTargetChess(scorePoints[i], 0);
+                }
+                // 计算分数
+                countScore(val, len);
+                // 计算进阶数字
+                var next = chessNextLevel(val);
+                setTargetChess(location, next);
+                rangeLevel ++;
+            }
+            // 播放音效
+            if(everConbined && $scope.settings.soundPlay) {
+                document.getElementById('gameSound').play();
+            }
+            changePlane(map);
+            setTimeout(function(){
+                status = config.gameStatus.running;
+                if(!checkAlive()) {
+                    status = config.gameStatus.end;
+                    alert('游戏结束!');
+                }
+            }, 100)
+        }
+        function chessInProcess(location, val) {
+            // 周围相邻的点, 已经出现过
+            var seeds = {};
+            var key = locToKey(location);
+            seeds[key] = location;
+            // 相同的点
+            var score = {};
+            // 周围相邻的点, 未使用
+            var unusedPoints = {};
+            unusedPoints[key] = location;
+            while(true) {
+                for(var name in unusedPoints) {
+                    var loc = unusedPoints[name];
+                    delete unusedPoints[name];
+                    // 指定位置的数字与当前落子位置的数字相同
+                    if(getTargetChess(loc) === val) {
+                        var locStr = locToKey(loc);
+                        score[locStr] = loc;
+                        for(var i=0;i<$scope.dim;i++) {
+                            var a = loc[i] -1, b = loc[i] +1;
+                            // 相邻的位置在范围内
+                            if(a>=0&&a<$scope.size) {
+                                var tmpLoc = deepCopy(loc);
+                                tmpLoc[i] = a;
+                                var keyStr = locToKey(tmpLoc);
+                                if(seeds[keyStr] === undefined) {
+                                    seeds[keyStr] = tmpLoc;
+                                    unusedPoints[keyStr] = tmpLoc;
+                                }
+                            }
+                            if(b>=0&&b<$scope.size) {
+                                tmpLoc = deepCopy(loc);
+                                tmpLoc[i] = b;
+                                keyStr = locToKey(tmpLoc);
+                                if(seeds[keyStr] === undefined) {
+                                    seeds[keyStr] = tmpLoc;
+                                    unusedPoints[keyStr] = tmpLoc;
+                                }
+                            }
+                        }
+                    }
+                }
+                var size = 0;
+                for(var item in unusedPoints) {
+                    size ++;
+                }
+                if(size<1) {
+                    break;
+                }
+            }
+
+            var scorePoints = [];
+            for(var item in score) {
+                scorePoints.push(score[item]);
+            }
+            return scorePoints;
+        }
+
+        // 坐标转换为键值
+        function locToKey(loc) {
+            return loc.join(',');
+        }
+
+        // 检查游戏能否继续
+        function checkAlive() {
+            var alive  = false;
+            function traversal(node) {
+                if(alive){
+                    return;
+                }
+                if(node['val'] === undefined) {
+                    for(var i=0, len=node.length;i<len;i++) {
+                        traversal(node[i]);
+                    }
+                }else{
+                    if(node['val'] === 0) {
+                        alive = true;
+                        return;
+                    }
+                }
+            }
+            traversal(map);
+            return alive;
+        }
+
+        // 设置指定位置的数
+        function setTargetChess(location, val) {
+            var tmpMap = map, len = location.length;
+            for(var i=0;i<len-DIM_BASE;i++) {
+                tmpMap = tmpMap[location[i]];
+            }
+            var x = location[len-2], y = location[len-1];
+            tmpMap[x][y]['val'] = val;
+        }
+
+        // 获得指定位置的数
+        function getTargetChess(location) {
+            var tempMap = deepCopy(map);
+            if(location.length !== $scope.dim){
+                alert('系统bug!建议刷新重试');
+            }
+            for(var i=0, len=location.length;i<len;i++) {
+                tempMap = tempMap[location[i]]
+            }
+            return tempMap.val;
+        }
+
+        // 生成下一个数
+        function generateNextChess() {
+            var probs = deepCopy(config.prob);
+            $scope.data.now = generator(probs);
+        }
 
         function init() {
-            for(var i =0;i<$scope.size;i++) {
+            $scope.data.score = 0;
+            $scope.data.step = 0;
+            $scope.data.cols = [];
+            $scope.data.locations = [];
+            for(var i = 0;i<$scope.size;i++) {
                 $scope.data.cols.push(String.fromCharCode(65+i));
                 $scope.data.sandbox.push([])
             }
+            for(var i = 0;i<$scope.dim;i++) {
+                $scope.data.locations.push(0);
+            }
+            initMap($scope.dim, $scope.size);
+            generateNextChess();
         }
         init();
+
+        // 数字的大小不用css, 用js 获取棋盘大小, 重新设置
+        function potSize() {
+            var length = $('#playground').width();
+            var size = config.mapSize;
+            $('.pot').css('width', length/size + 'px')
+                .css('height', length/size + 'px')
+                .css('line-height', length/size + 'px');
+        }
+
+        // 保存地图
+        function saveMap() {
+
+        }
+
+        // 加载地图
+        function loadMap() {
+
+        }
+
+        // 保存成绩
+        function saveScore() {
+
+        }
+
+        // 读出成绩
+        function readScore() {
+
+        }
 
     });
 </script>
