@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>还是三合一</title>
+    <title>还是三合一呀</title>
     <meta name="apple-touch-fullscreen" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no"/>
@@ -785,6 +785,9 @@
             }else {
                 // 从ls 里加载地图, 配置, 分数等
                 loadStatus();
+                if(map.length != $scope.size) {
+                    initMap($scope.dim, $scope.size);
+                }
             }
             // 更新地图
             changePlane(map);
