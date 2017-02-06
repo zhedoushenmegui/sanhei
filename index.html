@@ -23,7 +23,7 @@
             -moz-user-select: none;
             -khtml-user-select: none;
             user-select: none;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         #content {
             margin-top: 20px;
@@ -292,28 +292,30 @@
     };
 
     var config = {
-      prob:{
-          1:520,
-          2:80,
-          3:40,
-          4:20,
-          '-1': 120,
-          '-2': 30,
-          '-3': 2
-      }, defaultDim: 2,      // 默认维度
+        prob:{              // 各数字的权重
+            1:525,
+            2:75,
+            3:25,
+            4:6,
+            '-1': 81,
+            '-2': 9,
+            '-3': 1
+        },
+        defaultDim: 2,      // 默认维度
         gameStatus:{
             'ready': 0,
             'running': 1,
             'end':2,
             'sys_pause': 3
         },
-        upLimit:9,     // 数字上限
-        downLimit:-4,    // 数字下限
-        pauseTime:100,   // 数字落下后暂停时间
-        scoreFactor: 2,    // 没多一个增加2倍分数
-        scoreFactorLevel: 3,    // 没多一层增加3倍分数
-        mapSize: 7,             // 地图尺寸
-        tempHubNum: 2,          // 临时存储区大小
+        upLimit:9,          // 数字上限
+        downLimit:-4,       // 数字下限
+        pauseTime:100,      // 数字落下后暂停时间
+        scoreFactor: 2,     // 每多一个增加2倍分数
+        scoreFactorLevel: 3,        // 每多一层增加3倍分数
+        mapSize: 7,                 // 地图尺寸
+        tempHubNum: 2,              // 临时存储区大小
+        alertTime: 3,               // 警告提示次数
     };
 
     // 随机生成棋盘内容
@@ -332,6 +334,7 @@
         return 1;
     }
 
+    // 初始生成地图, 增加了0
     function initGenerator() {
         var probs = deepCopy(config.prob);
         probs[0] = 800;
@@ -439,9 +442,11 @@
     
     var app = angular.module('myApp', []);
     app.controller('myCtrl', function($scope) {
-        var forbidLocInfoTime = 3;
-        var status = 0;      // 游戏状态
+        var forbidLocInfoTime = config.alertTime;
+        var gameStatus = config.gameStatus;      // 游戏状态
         var defaultDim = config.defaultDim;
+        // 地图初始化
+        var map = [];
         // 升级层数, 用于计算分数
         var rangeLevel = 0;
         $scope.settings = {
@@ -457,7 +462,7 @@
             score:0,    // 得分
             step:0,      // 步数
             tempHub: [],
-            locations: [] // 地图左上角坐标, 前两个是固定的
+            locations: [], // 地图左上角坐标, 前两个是固定的
         };
         $scope.best = {
             number:0,
@@ -466,9 +471,6 @@
         };
         // 加载个人最好成绩
         readScore();
-
-        // 地图初始化
-        var map = [];
 
         // 临时存储区初始化
         function initTempHub() {
@@ -495,7 +497,7 @@
 
         // 修改维度
         $scope.changeDim = function(dim) {
-            if(status === config.gameStatus.running) {
+            if(gameStatus === config.gameStatus.running) {
                 var ret = confirm("将重新开始, 确认?");
                 if(!ret) {
                     return;
@@ -560,9 +562,9 @@
 
         // 点击响应
         $scope.goStep = function(pot) {
-            if(status === config.gameStatus.sys_pause) {
+            if(gameStatus === config.gameStatus.sys_pause) {
                 return;
-            }else if(status === config.gameStatus.end) {
+            }else if(gameStatus === config.gameStatus.end) {
                 var ret = confirm('重新开始游戏?');
                 if(!ret) {
                     return;
@@ -570,7 +572,7 @@
                     init(true);
                 }
             }
-            status = config.gameStatus.running;
+            gameStatus = config.gameStatus.running;
             if(pot.val !== 0) {
                 if(forbidLocInfoTime-- > 0) {
                     alert('有数字位置不能放置数字,只能落在空地上.');
@@ -614,7 +616,7 @@
             setTargetChess(location, chessNum);
             changePlane(map);
             // 数字放下停顿0.1s
-            status = config.gameStatus.sys_pause;
+            gameStatus = config.gameStatus.sys_pause;
             var everConbined = false;
             while(true) {
                 var val = getTargetChess(location);
@@ -642,9 +644,9 @@
             }
             changePlane(map);
             setTimeout(function(){
-                status = config.gameStatus.running;
+                gameStatus = config.gameStatus.running;
                 if(!checkAlive()) {
-                    status = config.gameStatus.end;
+                    gameStatus = config.gameStatus.end;
                     alert('游戏结束!');
                 }
             }, 100)
@@ -764,6 +766,10 @@
             $scope.data.now = generator(probs);
         }
 
+        /**
+         * 游戏初始化
+         * @param restart 是否完全重启, 不从localStorage 中加载数据
+         */
         function init(restart) {
             $scope.data.score = 0;
             $scope.data.step = 0;
@@ -820,7 +826,7 @@
             }
         }
 
-        // 保存地图
+        // 保存游戏状态
         function saveStatus() {
             var mapObj = {
                 map: map,
@@ -828,7 +834,9 @@
                 score: $scope.data.score,
                 step: $scope.data.step,
                 tempHub: $scope.data.tempHub,
-                settings: $scope.settings
+                settings: $scope.settings,
+                forbidLocInfoTime: forbidLocInfoTime,
+                gameStatus: gameStatus,
             };
             var jsonMap = JSON.stringify(mapObj);
             var mapStr = base64Encoder(jsonMap);
@@ -836,7 +844,7 @@
             return localStorage.getItem(lsNameArray.map) === null;
         }
 
-        // 加载地图
+        // 加载游戏状态
         function loadStatus() {
             if(localStorage.getItem(lsNameArray.map)=== null) {
                 return null;
@@ -850,6 +858,16 @@
             $scope.data.step = obj.step;
             $scope.data.tempHub = obj.tempHub;
             $scope.settings = obj.settings;
+            if(obj['forbidLocInfoTime']!== undefined) {
+                forbidLocInfoTime = obj.forbidLocInfoTime;
+            }else{
+                forbidLocInfoTime = 1;
+            }
+            if(obj['gameStatus']!== undefined) {
+                gameStatus = obj.gameStatus;
+            }else{
+                gameStatus = config.gameStatus.running;
+            }
         }
 
         // 保存最好成绩

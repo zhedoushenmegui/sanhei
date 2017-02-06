@@ -1,8 +1,9 @@
 # Sanhei
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
-### 还是三合一(Another Threes Game)
+### 还是三合一呀(Another Threes Game)
 
-在线试玩: [http://game.ofchao.bid](http://game.ofchao.bid)
+在线试玩: [http://game.ofchao.bid](http://game.ofchao.bid)<br>
+微信访问: [http://game.catech.top](http://game.catech.top)
 
 
 之前玩过一款叫兔子来了的小游戏, 就是三个相邻的元素合成一个新元素.
@@ -14,7 +15,7 @@
 
 我在春节前, 试着重写了这个游戏. 与之前的区别主要在于:<br>
  - 语言使用html+js, 跨平台且对移动端支持较好
- - 使用AngularJS, 让我摆脱了与界面同步数据的地狱
+ - 使用AngularJS, 让我彻底从界面同步数据的中解脱了
  - 算法使用双重循环, 判断一个周围有多少相同的点
  - 同时没有使用图片, 仅使用数字, 降低理解游戏的成本
  - 支持更高维度
