@@ -5,7 +5,7 @@
 在线试玩: [http://game.ofchao.bid](http://game.ofchao.bid)<br>
 微信访问: [http://game.catech.top](http://game.catech.top)
 
-
+#### 简介
 之前玩过一款叫兔子来了的小游戏, 就是三个相邻的元素合成一个新元素.
 很可惜, 这个游戏后来不运营了.
 
@@ -19,6 +19,16 @@
  - 算法使用双重循环, 判断一个周围有多少相同的点
  - 同时没有使用图片, 仅使用数字, 降低理解游戏的成本
  - 支持更高维度
+ - 使用了H5的新特性:
+    - [Audio](http://www.runoob.com/html/html5-audio.html) 播放声音
+    - [LocalStorage](http://www.runoob.com/html/html5-webstorage.html) 存储游戏数据
+    - [Application Cache](http://www.runoob.com/html/html5-app-cache.html) 离线缓存, 只要访问过一次, 以后在没网的时候也能打开
+
+### Hint
+
+iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就可以想App 一样使用.
+
+
 
 待改进升级的点有:
  - 使用图片代替数字
