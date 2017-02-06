@@ -26,7 +26,7 @@
     - [Application Cache](http://www.runoob.com/html/html5-app-cache.html) 离线缓存, 只要访问过一次, 以后在没网的时候也能打开
 
 #### Hint
-iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就可以想App 一样使用.
+iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就能像原生App一样使用.<br>
 ![save-to-screen][1]
 
 #### Todo
@@ -40,4 +40,4 @@ iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就
 
 以上.
 
-[1]: https://raw.githubusercontent.com/zhedoushenmegui/sanhei/master/rm.pic/save-to-screen.min.jpg
+[1]: http://game.ofchao.bid/sanhei/rm.pic/save-to-screen.min.jpg
