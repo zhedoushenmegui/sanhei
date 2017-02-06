@@ -40,4 +40,4 @@ iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就
 
 以上.
 
-[1]: https://raw.githubusercontent.com/zhedoushenmegui/sanhei/master/rm.pic/save-to-screen.min.png
+[1]: https://raw.githubusercontent.com/zhedoushenmegui/sanhei/master/rm.pic/save-to-screen.min.jpg
