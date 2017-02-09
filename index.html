@@ -474,6 +474,7 @@
 
         // 临时存储区初始化
         function initTempHub() {
+            $scope.data.tempHub = [];
             for(var i =0;i< config.tempHubNum; i++) {
                 $scope.data.tempHub.push(0);
             }
@@ -771,6 +772,7 @@
          * @param restart 是否完全重启, 不从localStorage 中加载数据
          */
         function init(restart) {
+            gameStatus = config.gameStatus.ready;
             $scope.data.score = 0;
             $scope.data.step = 0;
             $scope.data.cols = [];
