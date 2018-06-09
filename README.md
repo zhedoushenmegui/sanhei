@@ -2,8 +2,7 @@
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 ### 还是三合一呀(Another Threes Game)
 
-在线试玩: [http://game.ofchao.bid](http://game.ofchao.bid)
-微信访问: [http://game.catech.top](http://game.catech.top)
+访问: [http://game.catech.top](http://game.catech.top)
 
 ![game-screen-shot][2]
 #### Rules
@@ -42,7 +41,7 @@ iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就
  - 增加服务端交互, 记录最好成绩
  - 增加分享功能
 
-我的邮箱是:lemon@ofchao.bid
+我的邮箱是: chaoy9413@163.com
 有问题和建议可以提给我. 反正也不一定有时间改.
 
 以上.
