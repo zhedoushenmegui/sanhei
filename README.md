@@ -46,5 +46,5 @@ iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就
 
 以上.
 
-[1]: http://game.ofchao.bid/sanhei/rm.pic/save-to-screen.min.jpg
+[1]: https://fp.catech.top/sanhei/save-to-screen.min.png
 [2]: https://static.oschina.net/uploads/space/2017/0207/162352_IIgU_1035928.png
