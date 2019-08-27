@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 ### 还是三合一呀(Another Threes Game)
 
-访问: [http://game.catech.top](http://game.catech.top)
+访问: [个人网站(没钱买域名了)](http://149.129.100.246/sanhei/index.html)
 
 ![game-screen-shot][2]
 #### Rules
@@ -46,5 +46,5 @@ iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就
 
 以上.
 
-[1]: https://fp.catech.top/sanhei/save-to-screen.min.png
+[1]: http://149.129.100.246/sanhei_pic/save-to-screen.min.png
 [2]: https://static.oschina.net/uploads/space/2017/0207/162352_IIgU_1035928.png
