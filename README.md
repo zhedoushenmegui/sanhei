@@ -2,6 +2,7 @@
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 ### 还是三合一呀(Another Threes Game)
 
+传送门: http://www.rrc-big-data.bid/game/sanhei/index.html?fr=github
 
 ![game-screen-shot][2]
 #### Rules
