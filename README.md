@@ -2,7 +2,6 @@
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 ### 还是三合一呀(Another Threes Game)
 
-访问: [个人网站(没钱买域名了)](http://149.129.100.246/sanhei/index.html)
 
 ![game-screen-shot][2]
 #### Rules

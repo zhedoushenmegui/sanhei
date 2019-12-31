@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="http://www.bootcss.com/p/buttons/css/buttons.css" />
     <style>
         body {
-            background-color: blanchedalmond;
+            background-color: #CCCCCC;
             -webkit-user-select: none;
             -moz-user-select: none;
             -khtml-user-select: none;
@@ -48,63 +48,50 @@
             color:grey;
         }
         .cl0{
-            background-color: greenyellow;
-            color: greenyellow;
+            background-color: #CCFFCC;
+            color: #CCFFCC;
         }
         .cl1{
             background-color: #FFFF99;
-            background: url("img/game/101_96.png");
         }
         .cl2{
             background-color: #FFCC99;
-            background: url("img/game/102_96.png");
         }
         .cl3{
             background-color: #FF9999;
-            background: url("img/game/103_64.png");
         }
         .cl4{
             background-color: #CCCC99;
-            background: url("img/game/104_128.png");
         }
         .cl5{
             background-color: #CC9999;
-            background: url("img/game/107_128.png");
         }
         .cl6{
             background-color: #99CC99;
-            background: url("img/game/109_128.png");
         }
         .cl7{
             background-color: #9999CC;
-            background: url("img/game/110_128.png");
         }
         .cl8{
             background-color: #99CCFF;
-            background: url("img/game/112_128.png");
         }
         .cl9{
             background-color: #999966;
-            background: url("img/game/113_128.png");
         }
         .cl-1{
             background-color: #336699;
-            background: url("img/game/304_1218.png");
             color:#ffffff;
         }
         .cl-2{
             background-color: #336666;
-            background: url("img/game/201_128.png");
             color:#ffffff;
         }
         .cl-3{
             background-color: #333333;
-            background: url("img/game/202_128.png");
             color:#ffffff;
         }
         .cl-4{
             background-color: #000033;
-            background: url("img/game/203_128.png");
             color:#ffffff;
         }
         #nextOne{
@@ -141,16 +128,9 @@
             border: 1px solid whitesmoke;
             font-weight: 300;
             font-size: 16px;
-            text-align: right;
+            vertical-align: middle;
+            text-align: center;
             transition-duration: .3s;
-            background-repeat: no-repeat;
-            background-size: contain;
-        }
-        .pot p {
-            position: relative;
-            bottom: -40px;
-            margin: 0;
-            font-weight: bolder;
         }
         /* 分数显示区域 */
         .panel {
@@ -180,6 +160,14 @@
 <body>
     <div id="content" class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-md-offset-3 col-lg-offset-4" ng-app="myApp" ng-controller="myCtrl">
         <div>
+            <audio id="gameSound" ng-hide="true">
+                <source src="media/2487.wav" type="audio/wav">
+            </audio>
+        </div>
+
+        <div id="soundControl">
+            <span class="glyphicon glyphicon-volume-down" ng-hide="settings.soundPlay" ng-click="changeSoundState()"></span>
+            <span class="glyphicon glyphicon-volume-off" ng-show="settings.soundPlay" ng-click="changeSoundState()"></span>
         </div>
 
         <div id="head">
@@ -189,10 +177,7 @@
                     重新开始
                 </button>
                 <span>
-                    <label id="nextOne" class="button-rounded" >下一个:</label>
-                    <span class="pot" ng-class="'cl'+data.now">
-                        <p>{{data.now}}</p>
-                    </span>
+                    <label id="nextOne" class="button-rounded" ng-class="'cl'+data.now">下一个:{{data.now}}</label>
                 </span>
             </div>
         </div>
@@ -229,9 +214,7 @@
                 <div class="line" ng-repeat="row in data.sandbox track by $index">
                     <span class="pot" ng-hide="true">{{$index + 1}}</span>
                     <span class="pot" ng-repeat="pot in row track by $index" ng-class="'cl'+pot.val"
-                          ng-click="goStep(pot)">
-                        <p>{{pot.val}}</p>
-                    </span>
+                          ng-click="goStep(pot)">{{pot.val}}</span>
                 </div>
             </div>
         </div>
@@ -242,7 +225,7 @@
                 暂存区:
                 <span ng-repeat="item in data.tempHub track by $index"
                       class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
-                    <p>{{item}}</p>
+                    {{item}}
                 </span>
             </p>
         </div>
@@ -330,7 +313,7 @@
         pauseTime:100,      // 数字落下后暂停时间
         scoreFactor: 2,     // 每多一个增加2倍分数
         scoreFactorLevel: 3,        // 每多一层增加3倍分数
-        mapSize: 6,                 // 地图尺寸
+        mapSize: 7,                 // 地图尺寸
         tempHubNum: 2,              // 临时存储区大小
         alertTime: 3,               // 警告提示次数
     };
@@ -658,7 +641,7 @@
             }
             // 播放音效
             if(everConbined && $scope.settings.soundPlay) {
-                //document.getElementById('gameSound').play();
+                document.getElementById('gameSound').play();
             }
             changePlane(map);
             setTimeout(function(){
@@ -823,12 +806,9 @@
             // 更新地图
             changePlane(map);
             // 地图重绘
-            // setInterval(potSize, 500);
+            setInterval(potSize, 500);
             // 保存地图状态
             saveStatus();
-            potSize();
-            setTimeout(potSize, 1000);
-            setTimeout(potSize, 1500);
         }
         init(false);
 
@@ -839,10 +819,12 @@
             var width = Math.floor(length/size);
             $('.pot').css('width', width + 'px')
                 .css('height', width + 'px')
+                .css('line-height', width + 'px');
             if(width>50) {
                 width = 50;
                 $('.temp-hub .pot').css('width', width + 'px')
                     .css('height', width + 'px')
+                    .css('line-height', width + 'px');
             }
         }
 

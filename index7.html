@@ -89,22 +89,22 @@
         }
         .cl-1{
             background-color: #336699;
-            background: url("img/game/304_1218.png");
+            background: url("img/game/203_128.png");
             color:#ffffff;
         }
         .cl-2{
             background-color: #336666;
-            background: url("img/game/201_128.png");
+            background: url("img/game/202_128.png");
             color:#ffffff;
         }
         .cl-3{
             background-color: #333333;
-            background: url("img/game/202_128.png");
+            background: url("img/game/201_128.png");
             color:#ffffff;
         }
         .cl-4{
             background-color: #000033;
-            background: url("img/game/203_128.png");
+            background: url("img/game/304_1218.png");
             color:#ffffff;
         }
         #nextOne{
@@ -148,8 +148,7 @@
         }
         .pot p {
             position: relative;
-            bottom: -40px;
-            margin: 0;
+            bottom: -15px;
             font-weight: bolder;
         }
         /* 分数显示区域 */
@@ -330,7 +329,7 @@
         pauseTime:100,      // 数字落下后暂停时间
         scoreFactor: 2,     // 每多一个增加2倍分数
         scoreFactorLevel: 3,        // 每多一层增加3倍分数
-        mapSize: 6,                 // 地图尺寸
+        mapSize: 7,                 // 地图尺寸
         tempHubNum: 2,              // 临时存储区大小
         alertTime: 3,               // 警告提示次数
     };
@@ -839,10 +838,12 @@
             var width = Math.floor(length/size);
             $('.pot').css('width', width + 'px')
                 .css('height', width + 'px')
+                .css('line-height', width + 'px');
             if(width>50) {
                 width = 50;
                 $('.temp-hub .pot').css('width', width + 'px')
                     .css('height', width + 'px')
+                    .css('line-height', width + 'px');
             }
         }
 
