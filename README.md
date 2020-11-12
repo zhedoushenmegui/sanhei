@@ -2,7 +2,6 @@
 
 ### 还是三合一呀(Another Threes Game)
 
-传送门: http://www.rrc-big-data.bid/game/sanhei/index.html?fr=github
 
 ![game-screen-shot][2]
 #### Rules
@@ -33,7 +32,6 @@
 
 #### Hint
 iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就能像原生App一样使用.<br>
-![save-to-screen][1]
 
 #### Todo
 待改进升级的点有:
@@ -45,6 +43,4 @@ iPhone/iPad 可以把网页用Safari 打开, 添加快捷方式到屏幕上, 就
 有问题和建议可以提给我. 反正也不一定有时间改.
 
 以上.
-
-[1]: http://149.129.100.246/sanhei_pic/save-to-screen.min.png
 [2]: https://raw.githubusercontent.com/zhedoushenmegui/sanhei/master/rm.pic/1.0.jpeg
