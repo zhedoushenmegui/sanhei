@@ -31,7 +31,7 @@
         }
 
         button {
-            width: 100px;
+            width: 160px;
             height: 40px;
             margin: 5px 10px;
             color: #ffffff;
@@ -132,9 +132,11 @@
                 </div>
             </div>
             <div style="min-height: 200px;  margin: 20px auto" v-if="end === 0">
-                <input v-model="inputWd" style="height: 30px; padding-left: 5px; max-width: 100px">
+                <input v-model="inputWd" style="height: 30px; padding-left: 5px; width: 170px">
                 <button @click="submit">确认</button>
+                <br>
                 <button @click="giveup">放弃</button>
+                <button @click="help">提示</button>
             </div>
             <div v-if="end >= 1" style="margin-top: 20px">
                 <div style="display: flex; justify-content: space-between;  ">
@@ -206,7 +208,7 @@
         wdx: null,
         wdy: [],
         ///
-        inputWd: '满腔热血',
+        inputWd: '隔三差五',
         history: {},
         rstList: [],
         ///
@@ -290,9 +292,14 @@
         }
       },
       init() {
-        let index = (Math.random() * wds.length).toFixed(0)
+        let index = parseInt((Math.random() * wds.length).toFixed(0))
         console.log(typeof chengyu, wds.length, index, wds[index]);
         this.setWord(wds[index])
+      },
+      help() {
+        if(this.end === 0) {
+          alert(this.wd[0])
+        }
       },
       submit() {
         let ans = this.inputWd.trim();
@@ -319,6 +326,9 @@
         this.rstList.push(this.check(tmp))
       },
       giveup() {
+        if(!confirm('确认放弃? ')) {
+          return false;
+        }
         this.end = 1;
       },
       restart() {
