@@ -1,6 +1,23 @@
-# Sanhei
+# 自制游戏小合集
 
-### 还是三合一呀(Another Threes Game)
+[地址](http://43.201.105.73/)
+
+### 猜成语
+这是原来的地址
+[handou](https://handle.antfu.me/) <br>
+这是我复刻的
+[fake_handou](http://43.201.105.73/fake_handou.html)
+
+
+### 倒腾颜色
+
+[倒腾颜色](http://43.201.105.73/color_tube.html)
+
+
+### 兔子来了(Another Threes Game)
+[兔子来了7](http://43.201.105.73/sanhei/index7.html) <br>
+[兔子来了](http://43.201.105.73/sanhei/index.html)
+
 
 
 ![game-screen-shot][2]
