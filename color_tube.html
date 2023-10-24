@@ -201,6 +201,8 @@
         localStorage.setItem(CTTUBES, JSON.stringify(obj));
       },
       initProcess: function () {
+        this.tubes = []
+        this.showTubes = [];
         for (let i = 0; i < EMPTY; i++) {
           this.tubes.push([]);
         }
@@ -216,17 +218,19 @@
         this.saveToLS();
       },
 
-      init() {
-        let _s = localStorage.getItem(CTTUBES);
+      init(reinit) {
         let flag = false;
-        if(_s) {
-          try {
-            let obj = JSON.parse(_s);
-            this.tubes = obj.tubes;
-            this.backupPlayground = obj.backupPlayground;
-            this.gameStatus = obj.gameStatus;
-            flag = true;
-          }catch (e) {}
+        if(!reinit) {
+          let _s = localStorage.getItem(CTTUBES);
+          if(_s) {
+            try {
+              let obj = JSON.parse(_s);
+              this.tubes = obj.tubes;
+              this.backupPlayground = obj.backupPlayground;
+              this.gameStatus = obj.gameStatus;
+              flag = true;
+            }catch (e) {}
+          }
         }
         ///
         if(!flag) {
@@ -314,12 +318,13 @@
         if (!flag) {
           return;
         }
+        localStorage.removeItem(CTTUBES)
         this.gameStatus = PRE;
         this.backupPlayground = [];
         this.selected = -1;
 
         // 换一局
-        this.init();
+        this.init(true);
         this.shuffle(2);
         this.saveToLS();
         this.show();
@@ -424,7 +429,7 @@
       }
     },
     created() {
-      this.init();
+      this.init(false);
     }
   });
 

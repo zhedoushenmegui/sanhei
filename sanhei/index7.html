@@ -283,14 +283,13 @@
     <!-- temp hub -->
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel temp-hub" ng-hide="data.tempHub.length < 1">
         <div>
-        <span ng-repeat="item in data.tempHub track by $index"
+        <div ng-repeat="item in data.tempHub track by $index"
               class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
-                                            <span class="pot-val">
-
-                        {{item}}
+            <span class="pot-val">
+                {{item}}
 
                         </span>
-                </span>
+                </div>
         </div>
     </div>
 
