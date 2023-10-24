@@ -13,9 +13,10 @@
     <link rel="apple-touch-icon-precomposed" href="/sanhei/img/scar.png"/>
     <link rel="icon" href="img/favicon.ico"/>
 
-    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.0.0/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" href="http://www.bootcss.com/p/buttons/css/buttons.css" />
+    <link rel="stylesheet"
+          href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="http://www.bootcss.com/p/buttons/css/buttons.css"/>
     <style>
         body {
             background-color: blanchedalmond;
@@ -26,7 +27,9 @@
         }
 
         #content {
-            margin-top: 20px;
+            margin: 20px auto 0;
+            max-width: 600px;
+            min-width: 390px;
         }
 
         #soundControl {
@@ -51,7 +54,7 @@
 
         .cl0 {
             background-color: greenyellow;
-            color: greenyellow;
+            color: greenyellow !important;
         }
 
         .cl1 {
@@ -159,9 +162,13 @@
         .line {
             width: 100%;
             margin: 0 auto;
+            display: flex;
+            justify-content: center;
         }
 
         .pot {
+            min-width: 50px;
+            min-height: 50px;
             display: inline-block;
             border: 1px solid whitesmoke;
             font-weight: 300;
@@ -176,6 +183,22 @@
             position: relative;
             bottom: -15px;
             font-weight: bolder;
+        }
+
+        .pot-val {
+            background-color: white;
+            color: #1d9c9c;
+            margin-top: 28px;
+            display: inline-block;
+            font-size: 12px;
+            border-radius: 8px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .cl0 .pot-val {
+            background-color: greenyellow;
+            color: greenyellow !important;
         }
 
         /* 分数显示区域 */
@@ -197,12 +220,15 @@
         /* 暂存区 */
         .temp-hub {
             text-align: left;
+            font-weight: bold;
             padding: 5px 10px;
+            background-color: white;
         }
 
         .temp-hub > p {
             margin-bottom: 0;
         }
+
     </style>
 
 </head>
@@ -213,26 +239,25 @@
     </div>
 
     <div id="head">
-        <div>
+        <div style="display: flex; justify-content: space-evenly; align-items: center">
+
+            <div>
+                    <span class="pot " ng-class="'cl'+data.now" style="width: 40px; height: 40px">
+                        <span class="pot-val">
+
+                        {{data.now}}
+
+                        </span>
+                    </span>
+            </div>
             <button class="btn button dim button-border button-rounded button-primary"
                     ng-repeat="item in [2]" ng-click="changeDim(item)">
                 重新开始
             </button>
-            <span>
-                    <label id="nextOne" class="button-rounded">下一个:</label>
-                    <span class="pot" ng-class="'cl'+data.now">
-                        <p>{{data.now}}</p>
-                    </span>
-                </span>
         </div>
     </div>
 
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel" id="scorePanel">
-        <div ng-hide="true">
-            <h4>当前维度:
-                <label class="label label-info"> {{dim}}</label>
-            </h4>
-        </div>
         <p class="score-panel">
                 <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                     得分:{{data.score}}
@@ -241,26 +266,15 @@
             <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                     步数:{{data.step}}
                 </span>
-        <p ng-hide="true">
-            坐标:
-            [ <span ng-repeat="item in data.locations track by $index"><i ng-hide="$index==0">, </i>{{item}}</span> ]
-        </p>
         </p>
     </div>
 
     <div id="playground">
-        <div id="thead" ng-hide="true">
-            <div name="tr" class="line">
-                <span class="pot">#</span>
-                <span class="pot" ng-repeat="col in data.cols track by $index">{{col}}</span>
-            </div>
-        </div>
         <div id="tbody">
             <div class="line" ng-repeat="row in data.sandbox track by $index">
-                <span class="pot" ng-hide="true">{{$index + 1}}</span>
                 <span class="pot" ng-repeat="pot in row track by $index" ng-class="'cl'+pot.val"
                       ng-click="goStep(pot)">
-                        <p>{{pot.val}}</p>
+                        <span style=" " class="pot-val">{{pot.val}}</span>
                     </span>
             </div>
         </div>
@@ -268,13 +282,16 @@
 
     <!-- temp hub -->
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel temp-hub" ng-hide="data.tempHub.length < 1">
-        <p>
-            暂存区:
-            <span ng-repeat="item in data.tempHub track by $index"
-                  class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
-                    <p>{{item}}</p>
+        <div>
+        <span ng-repeat="item in data.tempHub track by $index"
+              class="pot" ng-class="'cl'+item" ng-click="swapTempHub($index)">
+                                            <span class="pot-val">
+
+                        {{item}}
+
+                        </span>
                 </span>
-        </p>
+        </div>
     </div>
 
     <!-- best score -->
@@ -294,31 +311,14 @@
                 </span>
         </p>
     </div>
+    <div style="font-size: x-large; padding: 20px;   background-color: white">
 
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-hide="true">
         <div>
-            <table class="table table table-hover table-bordered">
-                <tr>
-                    <td>+</td>
-                    <td ng-repeat="item in data.locations track by $index" ng-class="{'disable':$index<2}"
-                        ng-click="changePlane($index, 1)">
-                        <span class="glyphicon glyphicon-arrow-up"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>位面调整</td>
-                    <td ng-repeat="item in data.locations track by $index" ng-class="{'disable':$index<2}">
-                        {{item}}
-                    </td>
-                </tr>
-                <tr>
-                    <td>-</td>
-                    <td ng-repeat="item in data.locations track by $index" ng-class="{'disable':$index<2}"
-                        ng-click="changePlane($index, 0)">
-                        <span class="glyphicon glyphicon-arrow-down"></span>
-                    </td>
-                </tr>
-            </table>
+            <a href="/fake_handou.html">fake handou</a>
+        </div>
+
+        <div>
+            <a href="/color_tube.html">color tube</a>
         </div>
     </div>
 </div>
@@ -628,13 +628,13 @@
         }
       }
       ///
-      if($scope.data.now === EXC) {
+      if ($scope.data.now === EXC) {
         if (pot.val === 0) {
           return;
         }
         $scope.data.now = pot.val;
         pot.val = 0;
-      }else {
+      } else {
         gameStatus = config.gameStatus.running;
         if (pot.val !== 0) {
           return;
@@ -882,9 +882,6 @@
       // setInterval(potSize, 500);
       // 保存地图状态
       saveStatus();
-      potSize();
-      setTimeout(potSize, 1000);
-      setTimeout(potSize, 1500);
     }
 
     init(false);
