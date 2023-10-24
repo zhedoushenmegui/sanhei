@@ -17,7 +17,9 @@
         }
 
         #main {
-            width: 414px;
+            width: 100%;
+            min-width: 390px;
+            max-width: 420px;
             margin: 0 auto;
             background-color: #333642;
         }
@@ -25,22 +27,19 @@
         #playground {
             margin: auto;
             display: block;
-            margin-top: 8%;
             margin-bottom: 8%;
+            padding-bottom: 30px;
             background: var(--background-color);
         }
 
         #tubes {
             width: 380px;
-            margin: 10px auto;
-            padding: 5px;
+            margin: 0 auto;
             overflow: hidden;
-
         }
 
         .tube {
-            width: 36px;
-            height: 210px;
+            height: 192px;
             margin: 30px 5px;
             border: 3px #ffffff solid;
             display: inline-block;
@@ -50,7 +49,8 @@
         }
 
         .tube-color {
-            width: 100%;
+            width: 36px;
+            height: 40px;
         }
 
         .tube > .tube-color:last-child {
@@ -74,322 +74,358 @@
         .tube:hover {
             cursor: pointer;
         }
+
+        #tubes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
 <div id="main">
-    <div class="box-canvas" id="playground" :style="{height: globalHeight+'px'}">
-        <div id="tubes" :style="{height:tubesHeight+'px'}">
+    <div class="box-canvas" id="playground">
+        <div id="tubes">
             <div v-for="(tube, index) in showTubes" class="tube" @click="clickOne(index)">
                 <div style="width:100%; height: 30px;"></div>
 
-                <div class="tube-color" v-for="i in range(ORDER - tube.length)"
-                     :style="{height:tubeColorHeight + 'px'}">
+                <div class="tube-color" v-for="i in range(ORDER - tube.length)">
                 </div>
                 <div class="tube-color" v-for="(color, j) in tube"
-                     :style="{background: color, height:tubeColorHeight + 'px'}">
+                     :style="{background: color}">
                 </div>
             </div>
         </div>
-        <div v-show="status === 0">
-            <button @click="shuffle(ORDER * 20)">打乱 {{ORDER * 20}} 次</button>
-            <button @click="shuffle(ORDER * 40)">打乱 {{ORDER * 40}} 次</button>
-            <button @click="shuffle(ORDER * 80)">打乱 {{ORDER * 80}} 次</button>
-            <button @click="shuffle(ORDER * 100)">打乱 {{ORDER * 100}} 次</button>
-        </div>
-        <div v-show="status === 1">
-            <button @click="goback()">回退一步</button>
-            <button @click="restart()">重新开始</button>
-            <button @click="giveup()">换一局</button>
 
+        <div style="width: 100%; min-width: 390px; text-align: center">
+            <span style="padding-left: 20px; color:white">Click: {{clickIndex}} </span>
+            <span style="padding-left: 20px; color:white">Step: [{{backupPlayground.length}}] </span>
         </div>
-        <div v-show="status === 2">
-            <button @click="restart()">重新开始</button>
-            <button @click="giveup()">换一局</button>
+        <div style="display: flex; justify-content: center">
+            <div v-show="gameStatus === 0">
+                <button @click="shuffle(ORDER * 20)">打乱 {{ORDER * 20}} 次</button>
+                <button @click="shuffle(ORDER * 40)">打乱 {{ORDER * 40}} 次</button>
+            </div>
+            <div v-show="gameStatus === 1">
+                <button @click="goback()">回退一步</button>
+                <br>
+                <button @click="giveup()">换一局</button>
+                <button @click="restart()">重新开始</button>
+            </div>
+            <div v-show="gameStatus === 2">
+                <button @click="restart()">重新开始</button>
+                <button @click="giveup()">换一局</button>
+            </div>
         </div>
     </div>
 
-    <div style="font-size: x-large; margin: 20px auto 0; width: 100%; padding-left: 15px">
-        <div>
-            <a href="color_tube.html">color tube</a>
-        </div>
+    <div style="font-size: x-large; padding: 20px;   background-color: white">
+
         <div>
             <a href="fake_handou.html">fake handou</a>
+        </div>
+
+        <div>
+            <a href="sanhei/index7.html">sanhei</a>
         </div>
     </div>
 </div>
 </body>
 <script>
   //// 0 未开始， 1游戏中， 2结束
-    const PRE = 0;
-    const PLAYING = 1;
-    const END = 2;
+  const PRE = 0;
+  const PLAYING = 1;
+  const END = 2;
 
-    const PER = 7;  // 一行几个试管  这个配置没有意义
-    const ORDER = 4; // 一个试管几种颜色
-    const SIZE = 14;
-    const EMPTY = 2;
+  const ORDER = 4; // 一个试管几种颜色
+  const SIZE = 14;
+  const EMPTY = 2;
 
-    const navy = '#000033';
-    const junlv = '#006633';
-    const qianlv = '#00FF99';
-    const qing = '#33FFFF';
-    const zise = '#660099';
-    const qiezi = '#6633CC';
-    const kaqise = '#666633';
-    const lan = '#6699FF';
-    const suliao = '#66FFFF';
-    const kafei = '#993300';
-    const zaohongse = '#996666'
-    const shuinihui = '#99CCCC';
-    const hong = '#CC0033';
-    const yinghuase = '#FF99CC';
-    const qianhuang = '#FFFF66';
-    const juhuang = '#FF6600';
-    const colors = [hong, lan, kaqise, qing, qianhuang, qianlv, zise, yinghuase, shuinihui, junlv, kafei, juhuang, navy, qiezi, suliao, zaohongse];
+  const navy = '#000033';
+  const junlv = '#006633';
+  const qianlv = '#00FF99';
+  const qing = '#33FFFF';
+  const zise = '#660099';
+  const qiezi = '#6633CC';
+  const kaqise = '#666633';
+  const lan = '#6699FF';
+  const suliao = '#66FFFF';
+  const kafei = '#993300';
+  const zaohongse = '#996666'
+  const shuinihui = '#99CCCC';
+  const hong = '#CC0033';
+  const yinghuase = '#FF99CC';
+  const qianhuang = '#FFFF66';
+  const juhuang = '#FF6600';
+  const colors = [hong, lan, kaqise, qing, qianhuang, qianlv, zise, yinghuase, shuinihui, junlv, kafei, juhuang, navy, qiezi, suliao, zaohongse];
 
-    function deepcopy(tubes) {
-        let arr = [];
-        for (let i = 0; i < tubes.length; i++) {
-            let tmp = [];
-            for (let j = 0; j < tubes[i].length; j++) {
-                tmp.push(tubes[i][j]);
-            }
-            arr.push(tmp);
-        }
-        return arr;
+
+  const CTTUBES = 'cttubes'
+
+  function deepcopy(tubes) {
+    let arr = [];
+    for (let i = 0; i < tubes.length; i++) {
+      let tmp = [];
+      for (let j = 0; j < tubes[i].length; j++) {
+        tmp.push(tubes[i][j]);
+      }
+      arr.push(tmp);
     }
+    return arr;
+  }
 
-    const MainHandling = Vue.createApp({
-        data() {
-            return {
-                //
-                size: SIZE,
-                selected: -1,
-                colors: colors,
-                tubes: [],
-                showTubes: [],
-                ORDER: ORDER,
-                //
-                globalHeight: 1080,
-                tubesHeight: Math.ceil(SIZE / PER * 360),
-                tubeColorHeight: 45,
-                //
-                status: 0,  // 0 未开始， 1游戏中， 2结束
-                //
-                backupPlayground: [],
-            }
-        },
-        methods: {
-            init: function () {
-                for (let i = 0; i < EMPTY; i++) {
-                    this.tubes.push([]);
-                }
-                for (let i = 0; i < SIZE - EMPTY; i++) {
-                    let cs = [];
-                    for (let j = 0; j < ORDER; j++) {
-                        //cs.push(colors[Math.floor(Math.random() * SIZE)]);
-                        cs.push(colors[i]);
-                    }
-                    this.tubes.push(cs);
-                }
-            },
-            range(size) {
-                let rst = [];
-                for (let i = 0; i < size; i++) {
-                    rst.push(i);
-                }
-                return rst;
-            },
-            clickOne(index) {
-                // 如果是 未开始 则开始
-                if (this.status === PRE) {
-                    this.status = PLAYING;
-                }
-                // 如果不是 playing 则不继续
-                if (this.status !== PLAYING) {
-                    return;
-                }
-                // 第一次点击
-                if (this.selected === -1) {
-                    // 如果试管不为空， 则记录当前试管序号
-                    if (this.tubes[index].length > 0) {
-                        this.selected = index;
-                    }
-                    return;
-                }
-                // 两次点击同一个试管， 取消
-                if (this.selected === index) {
-                    this.selected = -1;
-                    return;
-                }
-                // 第二次的试管满了
-                if (this.tubes[index].length === ORDER) {
-                    return;
-                }
-                if (this.tubes[index].length === 0) {
-                    this.backupData();
-                    let color = this.tubes[this.selected].pop();
-                    this.tubes[index].push(color);
-                    this.selected = -1;
-                    this.show();
-                    return;
-                }
-                let color0 = this.tubes[this.selected].slice(-1)[0];
-                let color1 = this.tubes[index].slice(-1)[0];
-                if (color0 === color1) {
-                    this.backupData();
-                    let color = this.tubes[this.selected].pop();
-                    this.tubes[index].push(color);
-                    this.selected = -1;
-                    this.show();
-                    return;
-                }
+  const MainHandling = Vue.createApp({
+    data() {
+      return {
+        //
+        size: SIZE,
+        selected: -1,
+        clickIndex: '-',
+        colors: colors,
+        ORDER: ORDER,
 
-            },
-            backupData() {
-                console.log("backup start", this.backupPlayground.length)
-                let arr = deepcopy(this.tubes);
-                this.backupPlayground.push(arr);
-                console.log("backup end", this.backupPlayground.length)
-
-            },
-            restart() {
-                let flag = confirm("确定重开？");
-                if (!flag) {
-                    return;
-                }
-                this.status = PLAYING;
-                let arr = this.backupPlayground[0];
-                this.backupPlayground = [];
-                this.selected = -1;
-                this.tubes = arr;
-                this.show();
-            },
-            giveup() {
-                let flag = confirm("确定换一局？ 跟现在不是一局哦！")
-                if (!flag) {
-                    return;
-                }
-                this.status = PRE;
-                this.backupPlayground = [];
-                this.selected = -1;
-
-                // 换一局
-                this.init();
-                this.shuffle(2);
-            },
-            goback() {
-                console.log("size", this.backupPlayground.length)
-                if (this.backupPlayground.length === 0) {
-                    return;
-                }
-                let flag = confirm("给杨超转10块钱？")
-                if (flag) {
-                    console.log("goback start", this.backupPlayground.length);
-                    let arr = this.backupPlayground.pop();
-                    this.selected = -1;
-                    this.tubes = arr;
-                    this.show();
-                    console.log("goback end", this.backupPlayground.length);
-                } else {
-                    alert("不转还想回退？")
-                }
-            },
-            shuffle(r) {
-                if (this.status !== 0) {
-                    return;
-                }
-                if (r < ORDER * 30) {
-                    r = ORDER * 30;
-                }
-                let last = -1;
-                for (let i = 0; i < r; i++) {
-                    let a = -1;
-                    while (a < 0) {
-                        let tmp = Math.floor(Math.random() * SIZE);
-                        if (this.tubes[tmp].length > 0 && tmp !== last) {
-                            a = tmp;
-                        }
-                    }
-                    //
-                    let b = -1;
-                    while (b < 0) {
-                        let tmp = Math.floor(Math.random() * SIZE);
-                        if (this.tubes[tmp].length < ORDER && tmp !== a) {
-                            b = tmp;
-                        }
-                    }
-                    //
-                    let color = this.tubes[a].pop();
-                    this.tubes[b].push(color);
-
-                }
-                // 对齐
-                while (true) {
-                    let cadi = [];
-                    for (let i = 0; i < SIZE; i++) {
-                        if (this.tubes[i].length < ORDER && this.tubes[i].length > 0) {
-                            cadi.push(i);
-                        }
-                    }
-                    let size = cadi.length;
-                    if (size < 2) {
-                        break;
-                    }
-                    for (let j = 0; j < Math.floor(size / 2); j++) {
-                        let k = size - j - 1;
-                        let mj = cadi[j];
-                        let mk = cadi[k];
-                        while (this.tubes[mj].length > 0 && this.tubes[mk].length < ORDER) {
-                            this.tubes[mk].push(this.tubes[mj].pop());
-                        }
-                    }
-                }
-                // 平移
-                for (let i = 0, j = EMPTY; i < EMPTY, j < SIZE;) {
-                    if (this.tubes[i].length > 0 && this.tubes[j].length === 0) {
-                        this.tubes[j] = this.tubes[i];
-                        this.tubes[i] = [];
-                    }
-                    if (this.tubes[i].length === 0) {
-                        i++;
-                    }
-                    if (this.tubes[j].length > 0) {
-                        j++;
-                    }
-                }
-                //
-                this.show();
-            },
-            show() {
-                // 检查是否获胜
-                let flag = true;
-                this.tubes.forEach(function (v) {
-                    let b = new Set(v);
-                    flag &= (b.size === 1 && v.length === ORDER) || v.length === 0
-                })
-                // 反转
-                this.showTubes = deepcopy(this.tubes);
-                this.showTubes.forEach(function (v) {
-                    v.reverse()
-                });
-                //
-                if (flag) {
-                    this.status = END;
-                    setTimeout(_=>{
-                      alert("恭喜获胜！")
-
-                    }, 500)
-                }
-            }
-        },
-        created() {
-            this.init();
-            this.shuffle(2);
+        ///
+        tubes: [],
+        showTubes: [],
+        //
+        gameStatus: 0,  // 0 未开始， 1游戏中， 2结束
+        //
+        backupPlayground: [],
+      }
+    },
+    methods: {
+      saveToLS() {
+        let obj = {tubes: this.tubes, backupPlayground: this.backupPlayground, gameStatus: this.gameStatus};
+        localStorage.setItem(CTTUBES, JSON.stringify(obj));
+      },
+      initProcess: function () {
+        for (let i = 0; i < EMPTY; i++) {
+          this.tubes.push([]);
         }
-    });
+        for (let i = 0; i < SIZE - EMPTY; i++) {
+          let cs = [];
+          for (let j = 0; j < ORDER; j++) {
+            //cs.push(colors[Math.floor(Math.random() * SIZE)]);
+            cs.push(colors[i]);
+          }
+          this.tubes.push(cs);
+        }
+        this.shuffle(2);
+        this.saveToLS();
+      },
 
-    MainHandling.mount("#main");
+      init() {
+        let _s = localStorage.getItem(CTTUBES);
+        let flag = false;
+        if(_s) {
+          try {
+            let obj = JSON.parse(_s);
+            this.tubes = obj.tubes;
+            this.backupPlayground = obj.backupPlayground;
+            this.gameStatus = obj.gameStatus;
+            flag = true;
+          }catch (e) {}
+        }
+        ///
+        if(!flag) {
+          this.initProcess();
+        }
+        ///
+        this.show();
+      },
+      range(size) {
+        let rst = [];
+        for (let i = 0; i < size; i++) {
+          rst.push(i);
+        }
+        return rst;
+      },
+      clickOne(index) {
+        this.clickIndex = index;
+        // 如果是 未开始 则开始
+        if (this.gameStatus === PRE) {
+          this.gameStatus = PLAYING;
+        }
+        // 如果不是 playing 则不继续
+        if (this.gameStatus !== PLAYING) {
+          return;
+        }
+        // 第一次点击
+        if (this.selected === -1) {
+          // 如果试管不为空， 则记录当前试管序号
+          if (this.tubes[index].length > 0) {
+            this.selected = index;
+          }
+          return;
+        }
+        // 两次点击同一个试管， 取消
+        if (this.selected === index) {
+          this.selected = -1;
+          return;
+        }
+        // 第二次的试管满了
+        if (this.tubes[index].length === ORDER) {
+          return;
+        }
+        if (this.tubes[index].length === 0) {
+          this.backupData();
+          let color = this.tubes[this.selected].pop();
+          this.tubes[index].push(color);
+          this.selected = -1;
+          this.saveToLS();
+          this.show();
+          return;
+        }
+        let color0 = this.tubes[this.selected].slice(-1)[0];
+        let color1 = this.tubes[index].slice(-1)[0];
+        if (color0 === color1) {
+          this.backupData();
+          let color = this.tubes[this.selected].pop();
+          this.tubes[index].push(color);
+          this.selected = -1;
+          this.saveToLS();
+          this.show();
+          return;
+        }
+      },
+      backupData() {
+        console.log("backup start", this.backupPlayground.length)
+        let arr = deepcopy(this.tubes);
+        this.backupPlayground.push(arr);
+        console.log("backup end", this.backupPlayground.length)
+      },
+      restart() {
+        let flag = confirm("确定重开？");
+        if (!flag) {
+          return;
+        }
+        this.gameStatus = PLAYING;
+        let arr = this.backupPlayground[0];
+        this.backupPlayground = [];
+        this.selected = -1;
+        this.tubes = arr;
+        this.saveToLS();
+        this.show();
+      },
+      giveup() {
+        let flag = confirm("确定换一局？ 跟现在不是一局哦！")
+        if (!flag) {
+          return;
+        }
+        this.gameStatus = PRE;
+        this.backupPlayground = [];
+        this.selected = -1;
+
+        // 换一局
+        this.init();
+        this.shuffle(2);
+        this.saveToLS();
+        this.show();
+      },
+      goback() {
+        console.log("size", this.backupPlayground.length)
+        if (this.backupPlayground.length === 0) {
+          return;
+        }
+        console.log("goback start", this.backupPlayground.length);
+        let arr = this.backupPlayground.pop();
+        this.selected = -1;
+        this.tubes = arr;
+        this.saveToLS();
+        this.show();
+        console.log("goback end", this.backupPlayground.length);
+      },
+      shuffle(r) {
+        if (this.gameStatus !== 0) {
+          return;
+        }
+        if (r < ORDER * 30) {
+          r = ORDER * 30;
+        }
+        let last = -1;
+        for (let i = 0; i < r; i++) {
+          let a = -1;
+          while (a < 0) {
+            let tmp = Math.floor(Math.random() * SIZE);
+            if (this.tubes[tmp].length > 0 && tmp !== last) {
+              a = tmp;
+            }
+          }
+          //
+          let b = -1;
+          while (b < 0) {
+            let tmp = Math.floor(Math.random() * SIZE);
+            if (this.tubes[tmp].length < ORDER && tmp !== a) {
+              b = tmp;
+            }
+          }
+          //
+          let color = this.tubes[a].pop();
+          this.tubes[b].push(color);
+        }
+        // 对齐
+        while (true) {
+          let cadi = [];
+          for (let i = 0; i < SIZE; i++) {
+            if (this.tubes[i].length < ORDER && this.tubes[i].length > 0) {
+              cadi.push(i);
+            }
+          }
+          let size = cadi.length;
+          if (size < 2) {
+            break;
+          }
+          for (let j = 0; j < Math.floor(size / 2); j++) {
+            let k = size - j - 1;
+            let mj = cadi[j];
+            let mk = cadi[k];
+            while (this.tubes[mj].length > 0 && this.tubes[mk].length < ORDER) {
+              this.tubes[mk].push(this.tubes[mj].pop());
+            }
+          }
+        }
+        // 平移
+        for (let i = 0, j = EMPTY; i < EMPTY, j < SIZE;) {
+          if (this.tubes[i].length > 0 && this.tubes[j].length === 0) {
+            this.tubes[j] = this.tubes[i];
+            this.tubes[i] = [];
+          }
+          if (this.tubes[i].length === 0) {
+            i++;
+          }
+          if (this.tubes[j].length > 0) {
+            j++;
+          }
+        }
+        //
+      },
+      show() {
+        // 检查是否获胜
+        let flag = true;
+        this.tubes.forEach(function (v) {
+          let b = new Set(v);
+          flag &= (b.size === 1 && v.length === ORDER) || v.length === 0
+        })
+        // 反转
+        this.showTubes = deepcopy(this.tubes);
+        this.showTubes.forEach(function (v) {
+          v.reverse()
+        });
+        //
+        if (flag) {
+          this.gameStatus = END;
+          localStorage.removeItem(CTTUBES);
+          setTimeout(_ => {
+            alert("恭喜获胜！")
+          }, 200)
+        }
+      }
+    },
+    created() {
+      this.init();
+    }
+  });
+
+  MainHandling.mount("#main");
 </script>
 </html>
