@@ -104,10 +104,6 @@
             <span style="padding-left: 20px; color:white">Step: [{{backupPlayground.length}}] </span>
         </div>
         <div style="display: flex; justify-content: center">
-            <div v-show="gameStatus === 0">
-                <button @click="shuffle(ORDER * 20)">打乱 {{ORDER * 20}} 次</button>
-                <button @click="shuffle(ORDER * 40)">打乱 {{ORDER * 40}} 次</button>
-            </div>
             <div v-show="gameStatus === 1">
                 <button @click="goback()">回退一步</button>
                 <br>
@@ -314,9 +310,11 @@
         this.show();
       },
       giveup() {
-        let flag = confirm("确定换一局？ 跟现在不是一局哦！")
-        if (!flag) {
-          return;
+        if(this.gameStatus === PLAYING) {
+          let flag = confirm("确定换一局？ 跟现在不是一局哦！")
+          if (!flag) {
+            return;
+          }
         }
         localStorage.removeItem(CTTUBES)
         this.gameStatus = PRE;
