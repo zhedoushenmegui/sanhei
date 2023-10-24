@@ -18,13 +18,13 @@
         }
 
         #main {
-            width: 414px;
+            width: 100%;
+            max-width: 414px;
             margin: 0 auto;
         }
 
         #playground {
             margin: auto;
-            padding: 10px;
             display: block;
             margin-bottom: 8%;
             background-color: #f5f5f5;
@@ -132,7 +132,7 @@
                 </div>
             </div>
             <div style="min-height: 200px;  margin: 20px auto" v-if="end === 0">
-                <input v-model="inputWd" style="height: 30px; padding-left: 5px; width: 170px">
+                <input v-model="inputWd" style="height: 35px; padding-left: 5px; width: 151px; margin: 5px 10px;">
                 <button @click="submit">确认</button>
                 <br>
                 <button @click="giveup">放弃</button>
@@ -183,6 +183,11 @@
   const qianhuang = '#FFFF66';
   const juhuang = '#FF6600';
   const colors = [hong, lan, kaqise, qing, qianhuang, qianlv, zise, yinghuase, shuinihui, junlv, kafei, juhuang, navy, qiezi, suliao, zaohongse];
+
+  const HANDOUWD = 'handouword';
+  const HANDOURST = 'handourst';
+  const HANDOUHIS = 'handouhis';
+
 
   function deepcopy(tubes) {
     let arr = [];
@@ -273,13 +278,12 @@
           } else if (this.wdy.tone.indexOf(a[3]) > -1) {
             check_rst[i][3].flag = 2; // 1 是相等, 2 是存在
           }
-
-
         }
         return check_rst;
       },
 
       setWord(wd) {
+        localStorage.setItem(HANDOUWD, wd);
         this.wd = wd;
         this.wdx = chengyu[wd];
         wdx = this.wdx;
@@ -291,13 +295,35 @@
           this.wdy.tone.push(wdx[i][3])
         }
       },
+
       init() {
-        let index = parseInt((Math.random() * wds.length).toFixed(0))
-        console.log(typeof chengyu, wds.length, index, wds[index]);
-        this.setWord(wds[index])
+        let wd = null;
+        if (localStorage.getItem(HANDOUWD) !== null) {
+          let _wd = localStorage.getItem(HANDOUWD);
+          if (_wd.length === 4 && chengyu[_wd]) {
+            wd = _wd;
+          }
+          let _s = localStorage.getItem(HANDOURST);
+          let _his = localStorage.getItem(HANDOUHIS)
+          try {
+            if (_s) {
+              this.rstList = JSON.parse(_s);
+            }
+            if (_his) {
+              this.history = JSON.parse(_his);
+            }
+          } catch (e) {}
+        }
+
+        if (wd === null) {
+          let index = parseInt((Math.random() * wds.length).toFixed(0))
+          wd = wds[index];
+        }
+        this.setWord(wd)
+        console.log(wds.length, wd, this.wdx);
       },
       help() {
-        if(this.end === 0) {
+        if (this.end === 0) {
           alert(this.wd[0])
         }
       },
@@ -321,14 +347,23 @@
         if (ans === this.wd) {
           alert('Win!')
           this.end = 2;
+          localStorage.removeItem(HANDOUWD);
+          localStorage.removeItem(HANDOURST);
+          localStorage.removeItem(HANDOUHIS)
           return true;
         }
         this.rstList.push(this.check(tmp))
+        localStorage.setItem(HANDOURST, JSON.stringify(this.rstList))
+        localStorage.setItem(HANDOUHIS, JSON.stringify(this.history))
       },
       giveup() {
-        if(!confirm('确认放弃? ')) {
+        if (!confirm('确认放弃? ')) {
           return false;
         }
+
+        localStorage.removeItem(HANDOUWD);
+        localStorage.removeItem(HANDOURST);
+        localStorage.removeItem(HANDOUHIS)
         this.end = 1;
       },
       restart() {
