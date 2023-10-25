@@ -100,19 +100,21 @@
         </div>
 
         <div style="width: 100%; min-width: 390px; text-align: center">
-            <span style="padding-left: 20px; color:white">Click: {{clickIndex}} </span>
-            <span style="padding-left: 20px; color:white">Step: [{{backupPlayground.length}}] </span>
+            <span style="padding-left: 20px; color:white">Click: {{clickIndex}} |
+                <span v-if="selected >= 0"  :style="{background: tubes[selected].slice(-1)[0]}" style="height: 10px; width: 10px; display: inline-block"></span>
+                <span v-else style="height: 10px; width: 10px; display: inline-block; background-color: white"></span>
+            </span>
+            <span style="padding-left: 20px; color:white">Step: {{cnt}}/{{ts.toFixed(1)}}s </span>
         </div>
         <div style="display: flex; justify-content: center">
             <div v-show="gameStatus === 1">
-                <button @click="goback()">回退一步</button>
-                <br>
-                <button @click="giveup()">换一局</button>
-                <button @click="restart()">重新开始</button>
+                <button @click="goback()">Back</button>
+                <button @click="giveup()">New</button>
+                <button @click="restart(false)">RE</button>
             </div>
             <div v-show="gameStatus === 2">
-                <button @click="restart()">重新开始</button>
-                <button @click="giveup()">换一局</button>
+                <button @click="restart(true)">RE</button>
+                <button @click="giveup()">New</button>
             </div>
         </div>
     </div>
@@ -178,6 +180,7 @@
         //
         size: SIZE,
         selected: -1,
+        selectColor: null,
         clickIndex: '-',
         colors: colors,
         ORDER: ORDER,
@@ -189,16 +192,56 @@
         gameStatus: 0,  // 0 未开始， 1游戏中， 2结束
         //
         backupPlayground: [],
+        cnt: 0, // 记录总步数
+        ts: 0, // 记录时间
+        _tsInter: null,
       }
     },
     methods: {
+      startTimer(){
+        if(this._tsInter === null) {
+          let v = this;
+          this._tsInter = setInterval(_=>{v.ts += .1}, 100)
+        }
+      },
+      stopTimer(){
+        if(this._tsInter) {
+          clearInterval(this._tsInter);
+          this._tsInter = null;
+        }
+      },
       saveToLS() {
-        let obj = {tubes: this.tubes, backupPlayground: this.backupPlayground, gameStatus: this.gameStatus};
+        let obj = {
+          tubes: this.tubes,
+          backupPlayground: this.backupPlayground,
+          gameStatus: this.gameStatus,
+          cnt:this.cnt,
+          ts: this.ts};
         localStorage.setItem(CTTUBES, JSON.stringify(obj));
+      },
+      loadFromLS() {
+        let _s = localStorage.getItem(CTTUBES);
+        if(_s) {
+          try {
+            let obj = JSON.parse(_s);
+            this.tubes = obj.tubes;
+            this.backupPlayground = obj.backupPlayground;
+            this.gameStatus = obj.gameStatus;
+            this.cnt = obj.cnt;
+            this.ts = obj.ts;
+            if(obj.ts>0) {
+              this.startTimer();
+            }
+            return true;
+          }catch (e) {}
+        }
+        return false;
       },
       initProcess: function () {
         this.tubes = []
         this.showTubes = [];
+        this.backupPlayground = []
+        this.cnt = 0;
         for (let i = 0; i < EMPTY; i++) {
           this.tubes.push([]);
         }
@@ -217,16 +260,7 @@
       init(reinit) {
         let flag = false;
         if(!reinit) {
-          let _s = localStorage.getItem(CTTUBES);
-          if(_s) {
-            try {
-              let obj = JSON.parse(_s);
-              this.tubes = obj.tubes;
-              this.backupPlayground = obj.backupPlayground;
-              this.gameStatus = obj.gameStatus;
-              flag = true;
-            }catch (e) {}
-          }
+            flag = this.loadFromLS();
         }
         ///
         if(!flag) {
@@ -243,6 +277,7 @@
         return rst;
       },
       clickOne(index) {
+        this.startTimer();
         this.clickIndex = index;
         // 如果是 未开始 则开始
         if (this.gameStatus === PRE) {
@@ -269,6 +304,8 @@
         if (this.tubes[index].length === ORDER) {
           return;
         }
+        let color0 = this.tubes[this.selected].slice(-1)[0];
+
         if (this.tubes[index].length === 0) {
           this.backupData();
           let color = this.tubes[this.selected].pop();
@@ -276,9 +313,9 @@
           this.selected = -1;
           this.saveToLS();
           this.show();
+          this.cnt ++;
           return;
         }
-        let color0 = this.tubes[this.selected].slice(-1)[0];
         let color1 = this.tubes[index].slice(-1)[0];
         if (color0 === color1) {
           this.backupData();
@@ -287,6 +324,7 @@
           this.selected = -1;
           this.saveToLS();
           this.show();
+          this.cnt ++;
           return;
         }
       },
@@ -296,10 +334,15 @@
         this.backupPlayground.push(arr);
         console.log("backup end", this.backupPlayground.length)
       },
-      restart() {
+      restart(clearTimeFlag) {
         let flag = confirm("确定重开？");
         if (!flag) {
           return;
+        }
+        this.clickIndex = -1;
+        this.cnt = 0;
+        if(clearTimeFlag) {
+          this.ts = 0;
         }
         this.gameStatus = PLAYING;
         let arr = this.backupPlayground[0];
@@ -320,7 +363,9 @@
         this.gameStatus = PRE;
         this.backupPlayground = [];
         this.selected = -1;
-
+        this.cnt =0;
+        this.ts = 0;
+        this.stopTimer();
         // 换一局
         this.init(true);
         this.shuffle(2);
@@ -420,6 +465,7 @@
         if (flag) {
           this.gameStatus = END;
           localStorage.removeItem(CTTUBES);
+          this.stopTimer();
           setTimeout(_ => {
             alert("恭喜获胜！")
           }, 200)
