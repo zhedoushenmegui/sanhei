@@ -49,6 +49,7 @@
         }
 
         .pot {
+            display: inline-block;
             width: 60px;
             height: 60px;
             font-size: 30px;
@@ -78,12 +79,8 @@
             <span style="padding-left: 20px; color:white">Step: {{cnt}}/{{ts.toFixed(1)}}s </span>
         </div>
         <div style="display: flex; justify-content: center">
-            <div v-show="gameStatus === 1">
-                <button @click="giveup()">New</button>
-            </div>
-            <div v-show="gameStatus === 2">
-                <button @click="giveup()">New</button>
-            </div>
+            <button @click="giveup()">New</button>
+            <button @click="clear()">Clear</button>
         </div>
 
         <div style="display: flex;flex-wrap: wrap; justify-content: center; margin-top: 20px; user-select: none">
@@ -95,23 +92,33 @@
             </div>
         </div>
 
-
         <div>
-            <div style="display: flex;justify-content: center; align-items: center; margin-top: 20px" class="cur" v-if="gameStatus === 0">
-                <div v-for="o in cur" class="pot">{{o.w}}</div>
-                <div v-if="cur.length<4" class="pot"></div>
-                <div v-if="cur.length<3" class="pot"></div>
-                <div v-if="cur.length<2" class="pot"></div>
-                <div v-if="cur.length<1" class="pot"></div>
-            </div>
+
 
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap">
-                <div style="display: flex;justify-content: center; align-items: center; margin-top: 0" class="cur"
-                     v-for="index in range(rst.length-1, -1, -1)">
-                    <div v-for="o in rst[index]" class="pot">{{o.w}}</div>
+                <div  class="cur" >
+                    <div>
+                        <div v-for="o in cur" class="pot">{{o.w}}</div>
+                        <div v-if="cur.length<4" class="pot"></div>
+                        <div v-if="cur.length<3" class="pot"></div>
+                        <div v-if="cur.length<2" class="pot"></div>
+                        <div v-if="cur.length<1" class="pot"></div>
+                    </div>
+                </div>
+                <div  class="cur" v-for="index in range(rst.length-1, -1, -1)">
+                    <div >
+                        <div v-for="o in rst[index]" class="pot">
+                            {{o.w}}
+                        </div>
+                    </div>
+                </div>
+
+                <div  class="cur" v-for="index in range(0, wordList.length - rst.length, 1)">
+                    <div>
+                        <div v-for="o in range(0, 4, 1)" class="pot"></div>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -248,6 +255,16 @@
           rst.push(i);
         }
         return rst;
+      },
+      clear() {
+        this.clickIndex = null;
+        if(this.cur) {
+          for(let i=0;i<this.cur.length; i++) {
+            let o = this.cur[i];
+            o.s = POTNOUSE;
+          }
+        }
+        this.cur = [];
       },
       clickOne(row, col) {
         row = parseInt(row)
