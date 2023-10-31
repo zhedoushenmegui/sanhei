@@ -22,15 +22,14 @@
             width: 100%;
             min-width: 390px;
             max-width: 420px;
-            margin: 0 auto;
+            margin: 20px auto;
             background-color: #333642;
         }
 
         #playground {
-            margin: auto;
+            margin: 8% auto;
             display: block;
-            margin-bottom: 8%;
-            padding-bottom: 30px;
+            padding-top: 20px;
             background: var(--background-color);
         }
 
@@ -63,6 +62,7 @@
             width: 40px;
             height: 40px;
             font-size: 20px;
+            vertical-align: top;
         }
 
     </style>
@@ -78,10 +78,6 @@
             </span>
             <span style="padding-left: 20px; color:white">Step: {{cnt}}/{{ts.toFixed(1)}}s </span>
         </div>
-        <div style="display: flex; justify-content: center">
-            <button @click="giveup()">New</button>
-            <button @click="clear()">Clear</button>
-        </div>
 
         <div style="display: flex;flex-wrap: wrap; justify-content: center; margin-top: 20px; user-select: none">
             <div v-for="(row, rowIndex) in playground">
@@ -93,10 +89,8 @@
         </div>
 
         <div>
-
-
-            <div style="display: flex; justify-content: space-around; flex-wrap: wrap">
-                <div  class="cur" >
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; padding: 10px 5px">
+                <div class="cur">
                     <div>
                         <div v-for="o in cur" class="pot">{{o.w}}</div>
                         <div v-if="cur.length<4" class="pot"></div>
@@ -105,20 +99,29 @@
                         <div v-if="cur.length<1" class="pot"></div>
                     </div>
                 </div>
-                <div  class="cur" v-for="index in range(rst.length-1, -1, -1)">
-                    <div >
+                <div class="cur" v-for="index in range(rst.length-1, -1, -1)">
+                    <div>
                         <div v-for="o in rst[index]" class="pot">
                             {{o.w}}
                         </div>
                     </div>
                 </div>
 
-                <div  class="cur" v-for="index in range(0, wordList.length - rst.length, 1)">
+                <div class="cur" v-for="index in range(0, wordList.length - rst.length, 1)">
                     <div>
                         <div v-for="o in range(0, 4, 1)" class="pot"></div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div style="display: flex; justify-content: center">
+            <button @click="giveup()">New</button>
+            <button @click="clear()">Clear</button>
+            <button @click="changeStrictMode" v-if="gameStatus === 0">
+                <span v-if="strictMode===0">Easy</span>
+                <span v-else>Strict</span>
+            </button>
         </div>
     </div>
 
@@ -146,6 +149,7 @@
   ////
   const POTNOUSE = 0;
   const POTUSED = 1;
+  const WCSM = 'WCSM';
 
   function deepcopy(obj) {
     let objClone = Array.isArray(obj) ? [] : {};
@@ -188,9 +192,15 @@
         cnt: 0, // 记录总步数
         ts: 0, // 记录时间
         _tsInter: null,
+        ///
+        strictMode: 0,
       }
     },
     methods: {
+      changeStrictMode() {
+        this.strictMode = 1 - this.strictMode;
+        localStorage.setItem(WCSM, this.strictMode)
+      },
       startTimer() {
         if (this._tsInter === null) {
           let v = this;
@@ -249,17 +259,19 @@
         this.show();
       },
       range(start, stop, gap) {
-        if(gap === 0) {return [start]}
+        if (gap === 0) {
+          return [start]
+        }
         let rst = [];
-        for (let i = start; gap>0?i < stop:i>stop; i+=gap) {
+        for (let i = start; gap > 0 ? i < stop : i > stop; i += gap) {
           rst.push(i);
         }
         return rst;
       },
       clear() {
         this.clickIndex = null;
-        if(this.cur) {
-          for(let i=0;i<this.cur.length; i++) {
+        if (this.cur) {
+          for (let i = 0; i < this.cur.length; i++) {
             let o = this.cur[i];
             o.s = POTNOUSE;
           }
@@ -267,6 +279,7 @@
         this.cur = [];
       },
       clickOne(row, col) {
+        this.gameStatus = PLAYING;
         row = parseInt(row)
         col = parseInt(col)
         this.startTimer();
@@ -274,43 +287,56 @@
         if (o.s !== POTNOUSE) {
           return false;
         }
-        this.cnt ++;
+        this.cnt++;
         this.clickIndex = o.w;
-        if (this.cur.length === 0) {
-          for (let i = 0; i < this.wordList.length; i++) {
-            if (o.w === this.wordList[i][0]) {
-              this.cur.push(o);
-              o.s = POTUSED;
-              break;
+        if(this.strictMode) {
+          if(this.cur.length < 4) {
+            this.cur.push(o);
+            o.s = POTUSED;
+          }
+          if(this.cur.length === 4) {
+            for (let i = 0; i < this.wordList.length; i++) {
+              if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && this.cur[2].w === this.wordList[i][2] && o.w === this.wordList[i][3]) {
+                this.rst.push(this.cur);
+                this.cur = [];
+                break;
+              }
             }
           }
-        }
-        else if (this.cur.length === 1) {
-          for (let i = 0; i < this.wordList.length; i++) {
-            if (this.cur[0].w === this.wordList[i][0] && o.w === this.wordList[i][1]) {
-              this.cur.push(o);
-              o.s = POTUSED;
-              break;
+        }else {
+          if (this.cur.length === 0) {
+            for (let i = 0; i < this.wordList.length; i++) {
+              if (o.w === this.wordList[i][0]) {
+                this.cur.push(o);
+                o.s = POTUSED;
+                break;
+              }
             }
-          }
-        }
-        else if (this.cur.length === 2) {
-          for (let i = 0; i < this.wordList.length; i++) {
-            if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && o.w === this.wordList[i][2]) {
-              this.cur.push(o);
-              o.s = POTUSED;
-              break;
+          } else if (this.cur.length === 1) {
+            for (let i = 0; i < this.wordList.length; i++) {
+              if (this.cur[0].w === this.wordList[i][0] && o.w === this.wordList[i][1]) {
+                this.cur.push(o);
+                o.s = POTUSED;
+                break;
+              }
             }
-          }
-        }
-        else if (this.cur.length === 3) {
-          for (let i = 0; i < this.wordList.length; i++) {
-            if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && this.cur[2].w === this.wordList[i][2] && o.w === this.wordList[i][3]) {
-              this.cur.push(o);
-              o.s = POTUSED;
-              this.rst.push(this.cur);
-              this.cur = [];
-              break;
+          } else if (this.cur.length === 2) {
+            for (let i = 0; i < this.wordList.length; i++) {
+              if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && o.w === this.wordList[i][2]) {
+                this.cur.push(o);
+                o.s = POTUSED;
+                break;
+              }
+            }
+          } else if (this.cur.length === 3) {
+            for (let i = 0; i < this.wordList.length; i++) {
+              if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && this.cur[2].w === this.wordList[i][2] && o.w === this.wordList[i][3]) {
+                this.cur.push(o);
+                o.s = POTUSED;
+                this.rst.push(this.cur);
+                this.cur = [];
+                break;
+              }
             }
           }
         }
@@ -327,7 +353,7 @@
       },
       show() {
         // 检查是否获胜
-        if (this.rst.length === SIZE * SIZE/4) {
+        if (this.rst.length === SIZE * SIZE / 4) {
           this.gameStatus = END;
           this.stopTimer();
           setTimeout(_ => {
@@ -337,6 +363,13 @@
       }
     },
     created() {
+      let s = localStorage.getItem(WCSM)
+      if(s !== null) {
+        s = parseInt(s)
+        if(s === 1) {
+          this.strictMode = 1;
+        }
+      }
       this.init(false);
     }
   });
