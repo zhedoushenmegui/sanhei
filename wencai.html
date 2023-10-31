@@ -284,14 +284,14 @@
       },
       back() {
         this.clickIndex = null;
-        if (this.cur) {
+        if (this.cur.length>0) {
           let o = this.cur.pop()
           o.s = POTNOUSE
         }
       },
       clear() {
         this.clickIndex = null;
-        if (this.cur) {
+        if (this.cur.length>0) {
           for (let i = 0; i < this.cur.length; i++) {
             let o = this.cur[i];
             o.s = POTNOUSE;
