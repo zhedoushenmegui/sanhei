@@ -264,6 +264,7 @@
             if (o.w === this.wordList[i][0]) {
               this.cur.push(o);
               o.s = POTUSED;
+              break;
             }
           }
         }
@@ -272,6 +273,7 @@
             if (this.cur[0].w === this.wordList[i][0] && o.w === this.wordList[i][1]) {
               this.cur.push(o);
               o.s = POTUSED;
+              break;
             }
           }
         }
@@ -280,6 +282,7 @@
             if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && o.w === this.wordList[i][2]) {
               this.cur.push(o);
               o.s = POTUSED;
+              break;
             }
           }
         }
