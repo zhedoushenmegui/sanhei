@@ -91,7 +91,7 @@
         <div>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; padding: 10px 5px">
                 <div class="cur">
-                    <div>
+                    <div style="color:dodgerblue">
                         <div v-for="o in cur" class="pot">{{o.w}}</div>
                         <div v-if="cur.length<4" class="pot"></div>
                         <div v-if="cur.length<3" class="pot"></div>
@@ -100,11 +100,11 @@
                     </div>
                 </div>
                 <div class="cur" v-for="index in range(rst.length-1, -1, -1)">
-                    <div>
+                    <a v-bind:href="'https://www.baidu.com/s?wd=' + join2(rst[index])" target="_blank">
                         <div v-for="o in rst[index]" class="pot">
                             {{o.w}}
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="cur" v-for="index in range(0, wordList.length - rst.length, 1)">
@@ -116,12 +116,19 @@
         </div>
 
         <div style="display: flex; justify-content: center">
+            <button @click="clear()" v-if="gameStatus === 1">Clear</button>
+            <button @click="back()" v-if="gameStatus === 1">Backspace</button>
+        </div>
+        <div style="display: flex; justify-content: center">
             <button @click="giveup()">New</button>
-            <button @click="clear()">Clear</button>
             <button @click="changeStrictMode" v-if="gameStatus === 0">
                 <span v-if="strictMode===0">Easy</span>
                 <span v-else>Strict</span>
             </button>
+            <button @click="help()" v-if="gameStatus === 1 && this.cur.length===0">Help</button>
+            <button v-if="gameStatus === 1 && this.cur.length>0" disabled style="background-color: #CCCCCC;">Help
+            </button>
+
         </div>
     </div>
 
@@ -182,8 +189,9 @@
         size: SIZE,
         ///
         wordList: [],
-        playground: [],
         mapping: {},
+
+        playground: [],
         cur: [],
         rst: [],
         //
@@ -197,6 +205,10 @@
       }
     },
     methods: {
+      join2(arr) {
+        return arr[0].w + arr[1].w + arr[2].w + arr[3].w
+
+      },
       changeStrictMode() {
         this.strictMode = 1 - this.strictMode;
         localStorage.setItem(WCSM, this.strictMode)
@@ -236,6 +248,7 @@
         this.cur = [];
         this.playground = []
         this.cnt = 0;
+        this.mapping = {};
         //
         let wordList = []
         let singleWordList = []
@@ -246,6 +259,7 @@
             continue;
           }
           wordList.push(wd);
+          this.mapping[wd] = 0;
           singleWordList.push(wd[0])
           singleWordList.push(wd[1])
           singleWordList.push(wd[2])
@@ -268,6 +282,13 @@
         }
         return rst;
       },
+      back() {
+        this.clickIndex = null;
+        if (this.cur) {
+          let o = this.cur.pop()
+          o.s = POTNOUSE
+        }
+      },
       clear() {
         this.clickIndex = null;
         if (this.cur) {
@@ -289,21 +310,20 @@
         }
         this.cnt++;
         this.clickIndex = o.w;
-        if(this.strictMode) {
-          if(this.cur.length < 4) {
+        if (this.strictMode) {
+          if (this.cur.length < 4) {
             this.cur.push(o);
             o.s = POTUSED;
           }
-          if(this.cur.length === 4) {
-            for (let i = 0; i < this.wordList.length; i++) {
-              if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && this.cur[2].w === this.wordList[i][2] && o.w === this.wordList[i][3]) {
-                this.rst.push(this.cur);
-                this.cur = [];
-                break;
-              }
+          if (this.cur.length === 4) {
+            let cur = this.join2(this.cur);
+            if (this.mapping[cur] === 0) {
+              this.rst.push(this.cur);
+              this.mapping[cur] = 1;
+              this.cur = [];
             }
           }
-        }else {
+        } else {
           if (this.cur.length === 0) {
             for (let i = 0; i < this.wordList.length; i++) {
               if (o.w === this.wordList[i][0]) {
@@ -335,6 +355,7 @@
                 o.s = POTUSED;
                 this.rst.push(this.cur);
                 this.cur = [];
+                this.mapping[this.wordList[i]] = 1;
                 break;
               }
             }
@@ -360,13 +381,24 @@
             alert("恭喜获胜！")
           }, 200)
         }
+      },
+      help() {
+        if (this.gameStatus === 1) {
+          for (let i = 0; i < this.wordList.length; i++) {
+            let wd = this.wordList[i]
+            if (this.mapping[wd] === 0) {
+              alert(wd[0])
+              break;
+            }
+          }
+        }
       }
     },
     created() {
       let s = localStorage.getItem(WCSM)
-      if(s !== null) {
+      if (s !== null) {
         s = parseInt(s)
-        if(s === 1) {
+        if (s === 1) {
           this.strictMode = 1;
         }
       }
