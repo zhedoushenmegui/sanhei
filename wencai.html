@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>文采飞扬</title>
+    <script src="https://cdn.staticfile.org/vue/3.3.4/vue.global.prod.min.js"></script>
+    <script src="chengyu.js"></script>
+    <style>
+        :root {
+            --background-color: #333642;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #main {
+            width: 100%;
+            min-width: 390px;
+            max-width: 420px;
+            margin: 0 auto;
+            background-color: #333642;
+        }
+
+        #playground {
+            margin: auto;
+            display: block;
+            margin-bottom: 8%;
+            padding-bottom: 30px;
+            background: var(--background-color);
+        }
+
+        button {
+            width: 120px;
+            height: 40px;
+            margin: 5px 10px;
+            color: #ffffff;
+            background-color: #336699;
+            border: 2px #ffffff solid;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            cursor: pointer;
+        }
+
+        .pot {
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            text-align: center;
+            line-height: 2.0;
+            background-color: white;
+            border: #000033 1px solid;
+        }
+
+        .cur .pot {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="main">
+    <div class="box-canvas" id="playground">
+        <div style="width: 100%; min-width: 390px; text-align: center">
+            <span style="padding-left: 20px; color:white">Click: {{clickIndex}} |
+                <span v-if="selected >= 0" :style="{background: tubes[selected].slice(-1)[0]}"
+                      style="height: 10px; width: 10px; display: inline-block"></span>
+                <span v-else style="height: 10px; width: 10px; display: inline-block; background-color: white"></span>
+            </span>
+            <span style="padding-left: 20px; color:white">Step: {{cnt}}/{{ts.toFixed(1)}}s </span>
+        </div>
+        <div style="display: flex; justify-content: center">
+            <div v-show="gameStatus === 1">
+                <button @click="giveup()">New</button>
+            </div>
+            <div v-show="gameStatus === 2">
+                <button @click="giveup()">New</button>
+            </div>
+        </div>
+
+        <div style="display: flex;flex-wrap: wrap; justify-content: center; margin-top: 20px; user-select: none">
+            <div v-for="(row, rowIndex) in playground">
+                <div v-for="(word, colIndex) in row" class="pot" @click="clickOne(rowIndex, colIndex)">
+                    <span v-if="word.s === potnouse">{{word.w}}</span>
+                    <span v-else style="color: #CCCCCC">{{word.w}}</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            <div style="display: flex;justify-content: center; align-items: center; margin-top: 20px" class="cur" v-if="gameStatus === 0">
+                <div v-for="o in cur" class="pot">{{o.w}}</div>
+                <div v-if="cur.length<4" class="pot"></div>
+                <div v-if="cur.length<3" class="pot"></div>
+                <div v-if="cur.length<2" class="pot"></div>
+                <div v-if="cur.length<1" class="pot"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap">
+                <div style="display: flex;justify-content: center; align-items: center; margin-top: 0" class="cur"
+                     v-for="index in range(rst.length-1, -1, -1)">
+                    <div v-for="o in rst[index]" class="pot">{{o.w}}</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div style="font-size: x-large; padding: 20px;   background-color: white">
+        <div>
+            <a href="/color_tube.html">color tube</a>
+        </div>
+
+        <div>
+            <a href="fake_handou.html">fake handou</a>
+        </div>
+
+        <div>
+            <a href="sanhei/index7.html">sanhei</a>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+  //// 0 未开始， 1游戏中， 2结束
+  const PRE = 0;
+  const PLAYING = 1;
+  const END = 2;
+  const SIZE = 6;  //
+  ////
+  const POTNOUSE = 0;
+  const POTUSED = 1;
+
+  function deepcopy(obj) {
+    let objClone = Array.isArray(obj) ? [] : {};
+    if (obj && typeof obj === "object") {
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          //判断ojb子元素是否为对象，如果是，递归复制
+          if (obj[key] && typeof obj[key] === "object") {
+            objClone[key] = deepcopy(obj[key]);
+          } else {
+            //如果不是，简单复制
+            objClone[key] = obj[key];
+          }
+        }
+      }
+    }
+    return objClone;
+  }
+
+  if (SIZE * SIZE % 4 !== 0) {
+    alert('size 设置错误')
+  }
+
+  const MainHandling = Vue.createApp({
+    data() {
+      return {
+        //
+        potnouse: POTNOUSE,
+        potused: POTUSED,
+        size: SIZE,
+        ///
+        wordList: [],
+        playground: [],
+        mapping: {},
+        cur: [],
+        rst: [],
+        //
+        gameStatus: 0,  // 0 未开始， 1游戏中， 2结束
+        //
+        cnt: 0, // 记录总步数
+        ts: 0, // 记录时间
+        _tsInter: null,
+      }
+    },
+    methods: {
+      startTimer() {
+        if (this._tsInter === null) {
+          let v = this;
+          this._tsInter = setInterval(_ => {
+            v.ts += .1
+          }, 100)
+        }
+      },
+      stopTimer() {
+        if (this._tsInter) {
+          clearInterval(this._tsInter);
+          this._tsInter = null;
+        }
+      },
+      shuffle(arr) {
+        this.playground = [];
+        for (let i = 0; i < SIZE; i++) {
+          this.playground.push([])
+          for (let j = 0; j < SIZE; j++) {
+            this.playground[i].push(null)
+          }
+        }
+        while (arr.length) {
+          let rowIndex = parseInt(Math.random() * SIZE.toFixed())
+          let colIndex = parseInt(Math.random() * SIZE.toFixed())
+          if (this.playground[rowIndex][colIndex] === null) {
+            this.playground[rowIndex][colIndex] = {w: arr.pop(), s: POTNOUSE, row: rowIndex, col: colIndex};
+          }
+        }
+      },
+      initProcess: function () {
+        this.rst = [];
+        this.cur = [];
+        this.playground = []
+        this.cnt = 0;
+        //
+        let wordList = []
+        let singleWordList = []
+        while (singleWordList.length < SIZE * SIZE) {
+          let index = parseInt(Math.random() * wds.length.toFixed())
+          let wd = wds[index];
+          if (wordList.indexOf(wd) > -1) {
+            continue;
+          }
+          wordList.push(wd);
+          singleWordList.push(wd[0])
+          singleWordList.push(wd[1])
+          singleWordList.push(wd[2])
+          singleWordList.push(wd[3])
+        }
+        this.wordList = wordList;
+        this.shuffle(singleWordList)
+      },
+      init(reinit) {
+        this.initProcess();
+        this.show();
+      },
+      range(start, stop, gap) {
+        if(gap === 0) {return [start]}
+        let rst = [];
+        for (let i = start; gap>0?i < stop:i>stop; i+=gap) {
+          rst.push(i);
+        }
+        return rst;
+      },
+      clickOne(row, col) {
+        row = parseInt(row)
+        col = parseInt(col)
+        this.startTimer();
+        let o = this.playground[row][col];
+        if (o.s !== POTNOUSE) {
+          return false;
+        }
+        this.cnt ++;
+        this.clickIndex = o.w;
+        if (this.cur.length === 0) {
+          for (let i = 0; i < this.wordList.length; i++) {
+            if (o.w === this.wordList[i][0]) {
+              this.cur.push(o);
+              o.s = POTUSED;
+            }
+          }
+        }
+        else if (this.cur.length === 1) {
+          for (let i = 0; i < this.wordList.length; i++) {
+            if (this.cur[0].w === this.wordList[i][0] && o.w === this.wordList[i][1]) {
+              this.cur.push(o);
+              o.s = POTUSED;
+            }
+          }
+        }
+        else if (this.cur.length === 2) {
+          for (let i = 0; i < this.wordList.length; i++) {
+            if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && o.w === this.wordList[i][2]) {
+              this.cur.push(o);
+              o.s = POTUSED;
+            }
+          }
+        }
+        else if (this.cur.length === 3) {
+          for (let i = 0; i < this.wordList.length; i++) {
+            if (this.cur[0].w === this.wordList[i][0] && this.cur[1].w === this.wordList[i][1] && this.cur[2].w === this.wordList[i][2] && o.w === this.wordList[i][3]) {
+              this.cur.push(o);
+              o.s = POTUSED;
+              this.rst.push(this.cur);
+              this.cur = [];
+              break;
+            }
+          }
+        }
+        this.show();
+      },
+      giveup() {
+        if (this.gameStatus === PLAYING) {
+          let flag = confirm("确定换一局？ 跟现在不是一局哦！")
+          if (!flag) {
+            return;
+          }
+        }
+        location.reload();
+      },
+      show() {
+        // 检查是否获胜
+        if (this.rst.length === SIZE * SIZE/4) {
+          this.gameStatus = END;
+          this.stopTimer();
+          setTimeout(_ => {
+            alert("恭喜获胜！")
+          }, 200)
+        }
+      }
+    },
+    created() {
+      this.init(false);
+    }
+  });
+
+  MainHandling.mount("#main");
+</script>
+</html>
