@@ -89,7 +89,7 @@
 
         <div>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; padding: 10px 5px">
-                <div class="cur">
+                <div class="cur" @click="back">
                     <div style="color:dodgerblue">
                         <div v-for="o in cur" class="pot">{{o.w}}</div>
                         <div v-if="cur.length<4" class="pot"></div>
@@ -252,9 +252,13 @@
         //
         let wordList = []
         let singleWordList = []
+
         while (singleWordList.length < SIZE * SIZE) {
           let index = parseInt(Math.random() * wds.length.toFixed())
           let wd = wds[index];
+          if (new Date().getMilliseconds() < 50 && wordList.indexOf('原神启动') === -1) {
+            wd = '原神启动'
+          }
           if (wordList.indexOf(wd) > -1) {
             continue;
           }
@@ -284,14 +288,14 @@
       },
       back() {
         this.clickIndex = null;
-        if (this.cur.length>0) {
+        if (this.cur.length > 0) {
           let o = this.cur.pop()
           o.s = POTNOUSE
         }
       },
       clear() {
         this.clickIndex = null;
-        if (this.cur.length>0) {
+        if (this.cur.length > 0) {
           for (let i = 0; i < this.cur.length; i++) {
             let o = this.cur[i];
             o.s = POTNOUSE;
