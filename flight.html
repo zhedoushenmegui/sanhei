@@ -85,7 +85,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="gameStatus === gs_end" style="display: flex; justify-content: center; margin-top: 1rem">
+        <div style="display: flex; justify-content: center; margin-top: 2rem">
             <button @click="reload">RE</button>
         </div>
 
@@ -159,28 +159,34 @@
       }
     },
     methods: {
-      loadFromLS(){
+      loadFromLS() {
         let s = localStorage.getItem(LSKEY);
-        if(s !== null) {
+        if (s !== null) {
           try {
             let obj = JSON.parse(s);
             this.best = obj.best;
 
-          }catch (e) {
+          } catch (e) {
             console.error(e)
           }
         }
       },
 
-      saveToLS(){
+      saveToLS() {
         let obj = {
-          best: this.best < this.ts?this.best:this.ts
+          best: this.best < this.ts ? this.best : this.ts
         }
         localStorage.setItem(LSKEY, JSON.stringify(obj))
       },
 
-      reload(){
-        location.reload();
+      reload() {
+        this.current = 0;
+        this.ts = 0;
+        this.stopTimer();
+        this.gameStatus = PRE;
+        this.init();
+
+
       },
       startTimer() {
         if (this._tsInter === null) {
@@ -217,7 +223,7 @@
             seq.push(cur);
           }
         }
-
+        this.startTimer();
       },
       clickOne(row, col) {
         if (this.gameStatus === PRE) {
@@ -234,10 +240,10 @@
           // 点对了
           this.current++;
           o.s = this.clicked;
-          if(this.current === max) {
+          if (this.current === max) {
             this.gameStatus = END;
             this.stopTimer();
-            if(this.ts < this.best) {
+            if (this.ts < this.best) {
               this.best = this.ts;
             }
             this.saveToLS();
