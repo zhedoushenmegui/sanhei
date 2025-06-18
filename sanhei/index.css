@@ -1,0 +1,210 @@
+body {
+    background-color: blanchedalmond;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    margin-top: 10px;
+}
+
+#content {
+    margin: 20px auto 0;
+    max-width: 600px;
+    min-width: 390px;
+}
+
+#soundControl {
+    width: 26px;
+    height: 26px;
+    border: 2px solid black;
+    border-radius: 50%;
+
+    float: right;
+    right: 40px;
+    top: 30px;
+    margin-top: 5px;
+
+    text-align: center;
+    line-height: 160%;
+    cursor: pointer;
+}
+
+.disable {
+    color: grey;
+}
+
+.cl0 {
+    background-color: greenyellow;
+    color: greenyellow !important;
+}
+
+.cl1 {
+    background-color: #FFFF99;
+    background: url("img/game/101_96.png");
+}
+
+.cl2 {
+    background-color: #FFCC99;
+    background: url("img/game/102_96.png");
+}
+
+.cl3 {
+    background-color: #FF9999;
+    background: url("img/game/103_64.png");
+}
+
+.cl4 {
+    background-color: #CCCC99;
+    background: url("img/game/104_128.png");
+}
+
+.cl5 {
+    background-color: #CC9999;
+    background: url("img/game/107_128.png");
+}
+
+.cl6 {
+    background-color: #99CC99;
+    background: url("img/game/109_128.png");
+}
+
+.cl7 {
+    background-color: #9999CC;
+    background: url("img/game/110_128.png");
+}
+
+.cl8 {
+    background-color: #99CCFF;
+    background: url("img/game/112_128.png");
+}
+
+.cl9 {
+    background-color: #999966;
+    background: url("img/game/113_128.png");
+}
+
+.cl402 {
+    background-color: #999966;
+    background: url("img/game/402_128.png");
+}
+
+.cl-1 {
+    background-color: #336699;
+    background: url("img/game/203_128.png");
+    color: #ffffff;
+}
+
+.cl-2 {
+    background-color: #336666;
+    background: url("img/game/202_128.png");
+    color: #ffffff;
+}
+
+.cl-3 {
+    background-color: #333333;
+    background: url("img/game/201_128.png");
+    color: #ffffff;
+}
+
+.cl-4 {
+    background-color: #000033;
+    background: url("img/game/304_1218.png");
+    color: #ffffff;
+}
+
+#nextOne {
+    line-height: 36px;
+    border: 2px solid #000000;
+    font-weight: 300;
+    font-size: 16px;
+    font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 20px;
+    margin: 0 10px;
+    transition-duration: .3s;
+}
+
+.button {
+    padding: 0 20px;
+}
+
+/* 地图样式 */
+#playground {
+    cursor: pointer;
+    width: 100%;
+}
+
+#playground > div {
+    width: 100%;
+}
+
+.line {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+.pot {
+    min-width: 50px;
+    min-height: 50px;
+    display: inline-block;
+    border: 1px solid whitesmoke;
+    font-weight: 300;
+    font-size: 16px;
+    text-align: right;
+    transition-duration: .3s;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.pot p {
+    position: relative;
+    bottom: -15px;
+    font-weight: bolder;
+}
+
+.pot-val {
+    background-color: white;
+    color: #1d9c9c;
+    margin-top: 28px;
+    display: inline-block;
+    font-size: 12px;
+    border-radius: 8px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.cl0 .pot-val {
+    background-color: greenyellow;
+    color: greenyellow !important;
+}
+
+/* 分数显示区域 */
+.panel {
+    font-weight: 300;
+    font-size: 16px;
+    font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 2px;
+    margin: 10px 1px 0;
+}
+
+#scorePanel {
+    margin-bottom: 10px;
+}
+
+/* 暂存区 */
+.temp-hub {
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 10px;
+    background-color: white;
+}
+
+.temp-hub > p {
+    margin-bottom: 0;
+}
