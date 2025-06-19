@@ -7,9 +7,10 @@ import GameList from "@/views/GameList.vue";
   <div style="width: 100%; min-height: calc(100vh)">
     <RouterView/>
     <!-- 这里判断如果是根目录 就不引入game list -->
-    <template v-if="$route.path !== '/sanhe1/'">
+    <template v-if="$route.path !== '/'">
       <GameList/>
     </template>
+    {{$route.path}}
   </div>
 
   <el-backtop :right="200" :bottom="150">
