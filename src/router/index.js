@@ -27,6 +27,11 @@ const routes = [
     name: 'colortube',
     path: '/colortube',
     component: () => import('../views/ColorTube.vue'),
+  },
+  {
+    name: 'sanhe1_3d',
+    path: '/sanhe1_3d',
+    component: () => import('../views/sanhe1_3d.vue'),
   }
 ]
 

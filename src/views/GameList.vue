@@ -28,6 +28,11 @@ export default {
       <span class="icon" style="background-color: #00ccff;">飞</span>
       flight</a>
   </div>
+<!--  <div>-->
+<!--    <a href="/sanhe1_3d">-->
+<!--      <span class="icon" style="background-color: #00cc55;">3D</span>-->
+<!--      兔子来了3D</a>-->
+<!--  </div>-->
 </div>
 </template>
 

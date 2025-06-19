@@ -5,17 +5,11 @@ import {
   deepCopy,
 } from "../utils/utils";
 // 定义常量和工具函数
-const DIM_BASE = 2;
-/// assert (DIM_BASE >= 2);
 const TOOL_UPPER = 401; // 道具升级一个元素
 const TOOL_EXC = 402;  // 道具提取地图上的元素
 const TOOL_ADD_HUB = 403 // 道具增加一个暂存区位置
 const TOOL_DEL = 404;  // 道具删除地图上的元素
 //
-const lsNameArray = {
-  map: 'map',
-  best: 'best'
-};
 
 // 配置对象
 const config = {
@@ -30,7 +24,6 @@ const config = {
     '-3': 3,
     [TOOL_EXC]: 10,  /// 道具
   },
-  defaultDim: 2,
   gameStatus: {
     'ready': 0,
     'running': 1,
@@ -72,8 +65,19 @@ function generator(probs) {
 function locToKey(loc) {
   return loc.join(',');
 }
+
 export default {
   name: "sanhe1",
+  props: {
+    dim: {
+      type: Number,
+      default: 2
+    },
+    size: {
+      type: Number,
+      default: 7
+    },
+  },
   data() {
     return {
       EXC: TOOL_EXC,
@@ -99,12 +103,12 @@ export default {
       settings: {
         soundPlay: true
       },
-      dimBase: DIM_BASE,
-      size: config.mapSize,
-      dim: config.defaultDim,
       ////
       curScoreMsg: '',
       curTipMsg: '',
+      ////
+      lsNameMap: 'map' + (this.dim > 2 ? this.dim : ''),
+      lsNameBest: 'best' + (this.dim > 2 ? this.dim : ''),
     }
   },
   methods: {
@@ -154,10 +158,10 @@ export default {
       this.saveStatus();
     },
     readScore() {
-      if (localStorage.getItem(lsNameArray.best) === null) {
+      if (localStorage.getItem(this.lsNameBest) === null) {
         return;
       }
-      let str = localStorage.getItem(lsNameArray.best);
+      let str = localStorage.getItem(this.lsNameBest);
       let jsonBest = base64Decoder(str);
       this.best = JSON.parse(jsonBest);
     },
@@ -206,17 +210,17 @@ export default {
       this.map = this.generateMap(0, [], dim, size);
       this.changePlane(this.map)
     },
-    onPut(pot){
-      if(this.gameStatus === config.gameStatus.end) {
-        if(!confirm("重新开始?")) {
+    onPut(pot) {
+      if (this.gameStatus === config.gameStatus.end) {
+        if (!confirm("重新开始?")) {
           return;
-        }else {
+        } else {
           this.init(true);
         }
       }
       // 提取地图元素
       if (this.now === TOOL_EXC) {
-        if(pot.val === 0) {
+        if (pot.val === 0) {
           // 空地不能提取
           return;
         }
@@ -224,11 +228,11 @@ export default {
         pot.val = 0;
       } else {
         this.gameStatus = config.gameStatus.running;
-        if(pot.val !== 0) {
+        if (pot.val !== 0) {
           // 非空地不能放置
           return;
         }
-        this.step ++;
+        this.step++;
         this.chessIn(pot.loc)
         this.updateBest(pot.val)
       }
@@ -242,7 +246,7 @@ export default {
     countScore(val, size) {
       let _size = size - 3
       let factor = 5 + config.scoreFactor * (size - 3) + config.scoreFactorLevel * this.rangeLevel;
-      if(val < 0) {
+      if (val < 0) {
         val *= -1
       }
       let delta = factor * val
@@ -265,7 +269,7 @@ export default {
       }
       return target;
     },
-    generateNextChess(){
+    generateNextChess() {
       let probs = deepCopy(config.prob);
       this.now = generator(probs);
     },
@@ -293,7 +297,7 @@ export default {
       }, 20)
       ////
       this.curScoreMsg = '';
-      while(true) {
+      while (true) {
         let val = this.getTargetChess(location);
         let scorePoints = this.chessInProcess(location, val);
         let len = scorePoints.length;
@@ -321,12 +325,12 @@ export default {
     changePlane(map) {
       let location = this.locations;
       let tmpMap = map;
-      for (let i = 0, len = location.length - DIM_BASE; i < len; i++) {
+      for (let i = 0, len = location.length - this.dim; i < len; i++) {
         tmpMap = tmpMap[location[i]];
       }
       this.sandbox = tmpMap;
     },
-    onChangePlane(index, ifUp){
+    onChangePlane(index, ifUp) {
       let t = this.locations[index];
       if (ifUp) {
         t++;
@@ -396,6 +400,7 @@ export default {
     checkAlive() {
       this.saveStatus();
       let alive = false;
+
       function traversal(node) {
         if (alive) {
           return;
@@ -413,13 +418,15 @@ export default {
           }
         }
       }
+
       traversal(this.map);
       return alive;
     },
     setTargetChess(location, val) {
       let tmpMap = this.map;
       let len = location.length;
-      for (let i = 0; i < len - DIM_BASE; i++) {
+      console.log(location, this.dim)
+      for (let i = 0; i < len - this.dim; i++) {
         tmpMap = tmpMap[location[i]];
       }
       let x = location[len - 2], y = location[len - 1];
@@ -474,14 +481,14 @@ export default {
       };
       let jsonMap = JSON.stringify(mapObj);
       let mapStr = base64Encoder(jsonMap);
-      localStorage.setItem(lsNameArray.map, mapStr);
-      return localStorage.getItem(lsNameArray.map) === null;
+      localStorage.setItem(this.lsNameMap, mapStr);
+      return localStorage.getItem(this.lsNameMap) === null;
     },
     loadStatus() {
-      if (localStorage.getItem(lsNameArray.map) === null) {
+      if (localStorage.getItem(this.lsNameMap) === null) {
         return null;
       }
-      let mapStr = localStorage.getItem(lsNameArray.map);
+      let mapStr = localStorage.getItem(this.lsNameMap);
       let jsonMap = base64Decoder(mapStr);
       let obj = JSON.parse(jsonMap);
       this.map = obj.map;
@@ -513,35 +520,35 @@ export default {
       }
       let jsonBest = JSON.stringify(this.best);
       let strBest = base64Encoder(jsonBest);
-      localStorage.setItem(lsNameArray.best, strBest);
+      localStorage.setItem(this.lsNameBest, strBest);
     },
     genTipMsg() {
       this.curTipMsg = '';
-      if(this.now === TOOL_EXC) {
+      if (this.now === TOOL_EXC) {
         this.curTipMsg = '小吊车可以提取地图上元素,并任意放置.'
       }
-      if(this.now === -1) {
+      if (this.now === -1) {
         this.curTipMsg = '小兔子咕叽咕叽就来了.'
       }
-      if(this.now === -2) {
+      if (this.now === -2) {
         this.curTipMsg = '小兔子带来了玩具.'
       }
-      if(this.now === -3) {
+      if (this.now === -3) {
         this.curTipMsg = '小兔子在玩什么游戏呢？'
       }
-      if(this.now === 1) {
+      if (this.now === 1) {
         this.curTipMsg = '四叶草代表幸运'
       }
-      if(this.now === 2) {
+      if (this.now === 2) {
         this.curTipMsg = '胡萝卜为伞形科胡萝卜属'
       }
-      if(this.now === 3) {
+      if (this.now === 3) {
         this.curTipMsg = '胡萝卜为什么变成了大树呢?'
       }
-      if(this.now === 4) {
+      if (this.now === 4) {
         this.curTipMsg = '这棵大树是从戴夫后花园里搬来的'
       }
-      if(this.now === 5) {
+      if (this.now === 5) {
         this.curTipMsg = '幸运得没边了!'
       }
     }
@@ -555,9 +562,9 @@ export default {
 </script>
 
 <template>
-  <div id="content" class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-md-offset-3 col-lg-offset-4" >
+  <div id="content" class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-md-offset-3 col-lg-offset-4">
     <div style="height: 1rem; width: 100%"></div>
-    <div id="head" >
+    <div id="head">
       <div style="display: flex; justify-content: space-evenly; align-items: center">
         <div>
             <span class="pot" :class="'cl' + now" style="width: 40px; height: 40px">
@@ -574,13 +581,14 @@ export default {
       <!-- 提示 -->
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel" v-if="curTipMsg">
         <el-tag class="tips">
-          <el-icon><InfoFilled /></el-icon>
-          {{curTipMsg}}
+          <el-icon>
+            <InfoFilled/>
+          </el-icon>
+          {{ curTipMsg }}
         </el-tag>
         <p></p>
       </div>
     </div>
-
 
 
     <div id="playground">
@@ -592,7 +600,9 @@ export default {
                 v-for="(pot, potIndex) in line"
                 :key="potIndex"
                 @click="onPut(pot)">
-              <span class="pot-val">{{ pot.val }}</span>
+              <span class="pot-val" v-if="pot.val !== 0">{{ pot.val }}</span>
+              <span class="pot-val-show" v-else-if="dim > 2">{{ pot.loc.join(',') }}</span>
+
             </span>
         </div>
       </div>
@@ -617,7 +627,8 @@ export default {
       <p class="score-panel" id="scoreMsg">
         得分: {{ curScoreMsg }}
       </p>
-    </div>    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel" id="scorePanel">
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 panel" id="scorePanel">
       <p class="score-panel">
         本局成绩:
         <el-tag class="col-xs-4 col-sm-4 col-md-4 col-lg-4">得分:{{ score }}</el-tag>
@@ -650,10 +661,12 @@ body {
   max-width: 600px;
   min-width: 390px;
 }
+
 #scoreMsg {
   font-size: 14px;
   color: red;
 }
+
 #soundControl {
   width: 26px;
   height: 26px;
@@ -818,6 +831,16 @@ body {
   text-align: center;
 }
 
+.pot-val-show {
+  background-color: #1d9c9c;
+  color: white;
+  margin-top: 28px;
+  display: inline-block;
+  font-size: 12px;
+  min-width: 18px;
+  text-align: center;
+}
+
 .cl0 .pot-val {
   background-color: greenyellow;
   color: greenyellow !important;
@@ -829,7 +852,7 @@ body {
   color: #e6a23c !important;
 }
 
-.temp-hub .cl0 .pot-val{
+.temp-hub .cl0 .pot-val {
   background-color: #e6a23c;
   color: #e6a23c !important;
 }
