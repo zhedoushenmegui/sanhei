@@ -1,0 +1,1 @@
+import o from "./sanhe1-d757f170.js";import{_ as n,b as s,o as t,f as a}from "./index-2c3db99f.js";const c={name:"sanhe1_3d",components:{sanhe1:o}};function r(_, p, m, f, d, i){const e=s("sanhe1");return t(),a(e,{dim:3,size:5})}const u=n(c,[["render",r]]);export{u as default};

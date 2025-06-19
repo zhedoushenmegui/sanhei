@@ -8,23 +8,23 @@ export default {
 <template>
 <div style="max-width: 400px; margin: 1rem auto">
   <div>
-    <a href="colortube">
+    <a href="./colortube">
       <span class="icon" style="background-color: #de7525;">倒</span>
       color tube
     </a>
   </div>
   <div>
-    <a href="/sanhe1">
+    <a href="./sanhe1">
       <span class="icon" style="background-color: #777777;">兔</span>
       兔子来了</a>
   </div>
   <div>
-    <a href="/chengyu">
+    <a href="./chengyu">
       <span class="icon" style="background-color: #aa0000;">文</span>
       成语</a>
   </div>
   <div>
-    <a href="/flight">
+    <a href="./flight">
       <span class="icon" style="background-color: #00ccff;">飞</span>
       flight</a>
   </div>
