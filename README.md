@@ -2,12 +2,6 @@
 
 [地址](http://43.143.182.5/)
 
-### 猜成语
-这是原来的地址
-[handou](https://handle.antfu.me/) <br>
-这是我复刻的
-[fake_handou](http://43.143.182.5/fake_handou.html)
-
 
 ### 倒腾颜色
 
