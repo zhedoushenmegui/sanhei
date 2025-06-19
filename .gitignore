@@ -5,3 +5,4 @@ chengyu.py
 deploy.sh
 node_modules
 package-lock.json
+dist
