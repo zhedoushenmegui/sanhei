@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <sanhe1 :dim="3"></sanhe1>
+  <sanhe1 :dim="3" :size="5"></sanhe1>
 </template>
 
 <style scoped>
